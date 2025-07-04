@@ -45,11 +45,11 @@ public class randomChar {
             "Windshadow", "Xiong", "Yamada", "Yamaguchi", "Yan", "Zhanzheng", "Zhao", "Ziegler", "Zollman"
         };
         
-        name = firstName[roll(firstName.length)];
+        name = firstName[roll(firstName.length) - 1];
         if (roll(10) < 4) {
-            name += " " + nickName[roll(nickName.length)];
+            name += " " + nickName[roll(nickName.length) - 1];
         }
-        name += " " + lastName[roll(lastName.length)];
+        name += " " + lastName[roll(lastName.length) - 1];
 
         return name;
     }

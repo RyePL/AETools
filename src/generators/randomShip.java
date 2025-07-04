@@ -298,7 +298,7 @@ public class randomShip {
         for (int i = 0; i < rankedIndex; i++) {
             System.out.print("  " + rankedOfficerNames[i] + ": " + randomChar.generateName());
             System.out.println(" (Rank " + rankedOfficerRanks[i] + ")");
-            if (rankedOfficerRanks[i] > 2) {
+            if (rankedOfficerRanks[i] >= 2) {
                 System.out.println("  Boons: " + randomChar.generateBoons(rankedOfficerRanks[i]));
             }
         }
