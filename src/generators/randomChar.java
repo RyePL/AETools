@@ -1,7 +1,46 @@
 package generators;
 
 public class randomChar {
-    
+    public static void main(String[] args) {
+        System.out.println(generateName());
+
+        String[] statNames = {"STR", "DEX", "CON", "INT", "WIS", "CHA"};
+        int[] statValues = new int[6];
+        int[] statMods = new int[6];
+
+        for (int i = 0; i < 6; i++) {
+            statValues[i] = statRoll();
+            statMods[i] = (statValues[i] - 10) / 2;
+        }
+
+        // Find indices of best and worst stats
+        int bestStatIndex = 0;
+        int worstStatIndex = 0;
+        for (int i = 1; i < 6; i++) {
+            if (statValues[i] > statValues[bestStatIndex]) {
+                bestStatIndex = i;
+            }
+            if (statValues[i] < statValues[worstStatIndex]) {
+                worstStatIndex = i;
+            }
+        }
+
+        String[][] qualities = {
+            {"Beefy", "Muscular", "Slight", "Frail"},
+            {"Nimble", "Quick", "Slow", "Clumsy"},
+            {"Resolute", "Stout", "Weak", "Sickly"},
+            {"Razor-Sharp", "Bright", "Dim", "Slow"},
+            {"Deepened", "Aware", "Aloof", "Unaware"},
+            {"Magnetic", "Charming", "Unpleasant", "Unlikeable"}
+        };
+        
+        // Direct mapping for quality index
+        int bestQualityIndex = (statMods[bestStatIndex] <= -2) ? 3 : (statMods[bestStatIndex] <= 0) ? 2 : (statMods[bestStatIndex] <= 2) ? 1 : 0;
+        int worstQualityIndex = (statMods[worstStatIndex] <= -2) ? 3 : (statMods[worstStatIndex] <= 0) ? 2 : (statMods[worstStatIndex] <= 2) ? 1 : 0;
+        
+        System.out.println(qualities[bestStatIndex][bestQualityIndex] + ", " + qualities[worstStatIndex][worstQualityIndex]);
+        System.out.println("Debug: " + statMods[bestStatIndex] + ", " + statMods[worstStatIndex]);
+    }
 
     public static String generateName() {
         String name = "";
@@ -93,6 +132,27 @@ public class randomChar {
 
     private static int roll(int size) {
         return (int) (Math.random() * size) + 1;
+    }
+
+    private static int multiRoll(int size, int num) {
+        int total = 0;
+        for (int i = 0; i < num; i++) {
+            total += roll(size);
+        }
+        return total;
+    }
+
+    private static int statRoll() {
+        int lowest = 100;
+        int total = 0;
+        for (int i = 0; i < 4; i++) {
+            int roll = roll(6);
+            total += roll;
+            if (roll < lowest) {
+                lowest = roll;
+            }
+        }
+        return total - lowest;
     }
 
     private static String stringSelect(int num, int[] thresholds, String[] results) {
