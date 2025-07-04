@@ -39,7 +39,71 @@ public class randomChar {
         int worstQualityIndex = (statMods[worstStatIndex] <= -2) ? 3 : (statMods[worstStatIndex] <= 0) ? 2 : (statMods[worstStatIndex] <= 2) ? 1 : 0;
         
         System.out.println(qualities[bestStatIndex][bestQualityIndex] + ", " + qualities[worstStatIndex][worstQualityIndex]);
-        System.out.println("Debug: " + statMods[bestStatIndex] + ", " + statMods[worstStatIndex]);
+        
+        String[] classes = {"Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"};
+        String[] keyStats = {"STR", "CHA", "WIS", "WIS", "STR", "DEX", "STR", "DEX", "DEX", "CHA", "CHA", "INT"};
+        int[] keyStatRatings = new int[12];
+
+        for (int i = 0; i < classes.length; i++) {
+            keyStatRatings[i] = statValues[matchIndex(statNames, keyStats[i])];
+        }
+
+        // Select character class using weighted random selection with keyStatRatings as weights
+        String charClass = weightedRandomSelect(classes, keyStatRatings);
+        
+
+        int classQuality = Math.max(statMods[matchIndex(statNames, keyStats[matchIndex(classes, charClass)])], 1);
+        int reverseQuality = Math.max(-statMods[worstStatIndex], 0);
+        int level = multiRoll(4, classQuality) - multiRoll(4, reverseQuality);
+        level = Math.max(level, 1);
+        level = Math.min(level, 20);
+
+        System.out.println("Level " + level + " " + charClass);
+
+        //index of spell slots equals spell level
+        int[] spellSlots = { 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        int[][] spellSlotReference = {
+            {2, 0, 0, 0, 0, 0, 0, 0, 0},   // 1st level
+            {3, 0, 0, 0, 0, 0, 0, 0, 0},   // 2nd level
+            {4, 2, 0, 0, 0, 0, 0, 0, 0},   // 3rd level
+            {4, 3, 0, 0, 0, 0, 0, 0, 0},   // 4th level
+            {4, 3, 2, 0, 0, 0, 0, 0, 0},   // 5th level
+            {4, 3, 3, 0, 0, 0, 0, 0, 0},   // 6th level
+            {4, 3, 3, 1, 0, 0, 0, 0, 0},   // 7th level
+            {4, 3, 3, 2, 0, 0, 0, 0, 0},   // 8th level
+            {4, 3, 3, 3, 1, 0, 0, 0, 0},   // 9th level
+            {4, 3, 3, 3, 2, 0, 0, 0, 0},   // 10th level
+            {4, 3, 3, 3, 2, 1, 0, 0, 0},   // 11th level
+            {4, 3, 3, 3, 2, 1, 0, 0, 0},   // 12th level
+            {4, 3, 3, 3, 2, 1, 1, 0, 0},   // 13th level
+            {4, 3, 3, 3, 2, 1, 1, 0, 0},   // 14th level
+            {4, 3, 3, 3, 2, 1, 1, 1, 0},   // 15th level
+            {4, 3, 3, 3, 2, 1, 1, 1, 0},   // 16th level
+            {4, 3, 3, 3, 2, 1, 1, 1, 1},   // 17th level
+            {4, 3, 3, 3, 3, 1, 1, 1, 1},   // 18th level
+            {4, 3, 3, 3, 3, 2, 1, 1, 1},   // 19th level
+            {4, 3, 3, 3, 3, 2, 2, 1, 1}    // 20th level
+        };
+        if (charClass.equals("Bard") || charClass.equals("Cleric") || charClass.equals("Druid") || charClass.equals("Sorcerer") || charClass.equals("Wizard")) {
+            for (int i = 0; i < spellSlots.length; i++) {
+                spellSlots[i] = spellSlotReference[level][i];
+            }
+        } else if ((charClass.equals("Paladin") || charClass.equals("Ranger")) && (level > 1)) {
+            for (int i = 0; i < spellSlots.length; i++) {
+                spellSlots[i] = spellSlotReference[Math.round(level/2)][i];
+            }
+        }
+
+        int proficiencyBonus = 2 + (level - 1) / 4;
+
+        String subClass = "";
+
+        if (charClass.equals("Barbarian")) {
+            if (roll(2) == 1) subClass = "Path of the Aether Transformation";
+            else subClass = "Path of the Wronged";
+
+
+        }
     }
 
     public static String generateName() {
@@ -162,5 +226,35 @@ public class randomChar {
             }
         }
         return results[results.length - 1];
+    }
+
+    private static int matchIndex(String[] array, String toFind) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i].equals(toFind)) return i;
+        }
+        return -1;
+    }
+
+    private static String weightedRandomSelect(String[] items, int[] weights) {
+        // Calculate total weight
+        int totalWeight = 0;
+        for (int weight : weights) {
+            totalWeight += weight;
+        }
+        
+        // Generate random number between 1 and total weight
+        int randomValue = roll(totalWeight);
+        
+        // Find the item corresponding to the random value
+        int currentWeight = 0;
+        for (int i = 0; i < items.length; i++) {
+            currentWeight += weights[i];
+            if (randomValue <= currentWeight) {
+                return items[i];
+            }
+        }
+        
+        // Fallback to last item (shouldn't reach here if weights are valid)
+        return items[items.length - 1];
     }
 }
