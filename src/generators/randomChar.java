@@ -50,7 +50,6 @@ public class randomChar {
 
         // Select character class using weighted random selection with keyStatRatings as weights
         String charClass = weightedRandomSelect(classes, keyStatRatings);
-        
 
         int classQuality = Math.max(statMods[matchIndex(statNames, keyStats[matchIndex(classes, charClass)])], 1);
         int reverseQuality = Math.max(-statMods[worstStatIndex], 0);
@@ -97,13 +96,148 @@ public class randomChar {
         int proficiencyBonus = 2 + (level - 1) / 4;
 
         String subClass = "";
+        int subClassIndex = roll(2);
+        int armorClass = 10;
+        int hitPoints = 0;
+        String basicAttack = "";
+        String features = "";
+        String actions = "";
+        String bonusActions = "";
+        String reactions = "";
 
         if (charClass.equals("Barbarian")) {
-            if (roll(2) == 1) subClass = "Path of the Aether Transformation";
+            if (subClassIndex == 1) subClass = "Path of the Aether Transformation";
             else subClass = "Path of the Wronged";
 
+            int rageDamage = 2;
+            String rageDescription = "Rage: Basic rage benefits. ";
+
+            if (level >= 2) {
+                features += "Danger Sense: Can't be surprised, advantage on DEX saves.\n";
+                features += "Reckless Attack: Can gain advantage on attacks but suffers advantage on hits until next turn.\n";
+            }
+            if (level >= 3) {
+                if (subClassIndex == 1) {
+                    rageDescription += "Immune to poison and force. Immune to poisoned condition. Gain d10 claw weapon. ";
+                }
+                else {
+                    reactions += "Outrage: On damage while raging, gain " + (level/2) + " temp HP and move half speed to the target.\n";
+                    reactions += "Outrage: On damage, rage.\n";
+                }
+            }
+            if (level >= 4) {
+                abilityImprovement(statValues, 0, 2);
+                updateModifiers(statValues, statMods);
+                rageDamage++;
+            }
+            if (level >= 5) {
+                features += "Multiattack: Can attack twice.\n";
+            }
+            if (level >= 6) {
+                if (subClassIndex == 1) {
+                    rageDescription += "Can choose between +1d6 poison damage, +2 AC, or magic resistance. ";
+                }
+                else {
+                    features += "On a saving throw, gain a grudge die. Expend the grudge die to add 1d6 to an attack roll.\n";
+                }
+            }
+            if (level >= 7) {
+                features += "Feral Instinct: Advantage on initiative rolls.\n";
+                rageDescription += "Move up to half speed on activation.\n";
+            }
+            if (level >= 8) {
+                abilityImprovement(statValues, 0, 2);
+                updateModifiers(statValues, statMods);
+            }
+            if (level >= 9) {
+                features += "Brutal Strike: Can forgo advantage to deal an extra 1d10 damage and either push or reduce speed by 15 ft.\n";
+                rageDamage++;
+            }
+            if (level >= 10) {
+                if (subClassIndex == 1) {
+                    features += "Call of the Aether: Immune to aether poisoning. Has full swim speed. Can cast detect magic.\n";
+                }
+                else {
+                    reactions += "Defiant Outburst: Once per day on hitting 0 HP, grant self and allies 1d12 HP.\n";
+                }
+            }
+            if (level >= 11) {
+                features += "Relentless Rage: On hitting 0 HP while raging, on a DC 10 CON save, regain " + (level * 2) + " HP. Save increases by 5 each time.\n";
+            }
+            if (level >= 12) {
+                abilityImprovement(statValues, 0, 2);
+                updateModifiers(statValues, statMods);
+            }
+            if (level >= 13) {
+                features += "Improved Brutal Strike: Can also give the target save disadvantage or -5 AC on next attack.\n";
+            }
+            if (level >= 14) {
+                if (subClassIndex == 1) {
+                    rageDescription += "Rage claws are now 2d12 weapons. Can use two features form Deep-Infused Rage.\n";
+                }
+                else {
+                    reactions += "Suffer No Insult: On damage or saving throw, gain advantage, fright immunity, and reaction attacks on the attacker.\n";
+                }
+            }
+            if (level >= 15) {
+                features += "Persistent Rage: Regain rage uses on initiative once per day. Rage does not need extending.\n";
+            }
+            if (level >= 16) {
+                abilityImprovement(statValues, 0, 2);
+                updateModifiers(statValues, statMods);
+                rageDamage++;
+            }
+            if (level >= 17) {
+                features += "Improved Brutal Strike: Now deals 2d10 bonus damage and can choose two features.\n";
+            }
+            if (level >= 18) {
+                features += "Indomitable Might: STR is floor for STR checks and saves.\n";
+            }
+            if (level >= 19) {
+                features += "Epic Booon: Choose one that is appropriate.\n";
+            }
+            if (level >= 20) {
+                statValues[0] += 4;
+                statValues[2] += 4;
+                updateModifiers(statValues, statMods);
+            }
+            bonusActions = rageDescription + "\n";
+            hitPoints = 12 + ((level - 1) * (7 + statMods[2]));
+            armorClass = 10 + statMods[1] + statMods[2];
+            basicAttack = "Greataxe: +" + (statMods[0] + proficiencyBonus) + " to hit, 1d12 + " + (statMods[0] + rageDamage) + " slashing";
+        }
+        else if (charClass.equals("Bard")) {
 
         }
+        else if (charClass.equals("Cleric")) {
+        }
+        else if (charClass.equals("Druid")) {
+        }
+        else if (charClass.equals("Fighter")) {
+        }
+        else if (charClass.equals("Monk")) {
+        }
+        else if (charClass.equals("Paladin")) {
+        }
+        else if (charClass.equals("Ranger")) {
+        }
+        else if (charClass.equals("Rogue")) {
+        }
+        else if (charClass.equals("Sorcerer")) {
+        }
+        else if (charClass.equals("Warlock")) {
+        }
+        else if (charClass.equals("Wizard")) {
+        }
+
+        System.out.println(subClass);
+        System.out.println("Hit Points: " + hitPoints);
+        System.out.println("Armor Class: " + armorClass);
+        System.out.println("Basic Attack: " + basicAttack);
+        System.out.println("Features: " + features);
+        System.out.println("Bonus Actions: " + bonusActions);
+        System.out.println("Actions: " + actions);
+        System.out.println("Reactions: " + reactions);
     }
 
     public static String generateName() {
@@ -256,5 +390,42 @@ public class randomChar {
         
         // Fallback to last item (shouldn't reach here if weights are valid)
         return items[items.length - 1];
+    }
+
+    private static void abilityImprovement(int[] abilities, int firstIndex, int secondIndex) {
+        int increases = 2;
+
+        // Prioritize first index, apply up to two increases if possible
+        int canIncreaseFirst = Math.min(20 - abilities[firstIndex], increases);
+        abilities[firstIndex] += canIncreaseFirst;
+        increases -= canIncreaseFirst;
+
+        // Then second index (if not the same as first)
+        if (increases > 0 && secondIndex != firstIndex && abilities[secondIndex] < 20) {
+            abilities[secondIndex]++;
+            increases--;
+        }
+
+        // If still increases left, randomly increment an element with value 18 or below
+        while (increases > 0) {
+            // Collect indices with value <= 18
+            java.util.List<Integer> candidates = new java.util.ArrayList<>();
+            for (int i = 0; i < abilities.length; i++) {
+                if (abilities[i] <= 18) {
+                    candidates.add(i);
+                }
+            }
+            if (candidates.isEmpty()) break; // No valid candidates
+
+            int randomIdx = candidates.get(roll(candidates.size()) - 1);
+            abilities[randomIdx]++;
+            increases--;
+        }
+    }
+
+    private static void updateModifiers(int[] abilities, int[] modifiers) {
+        for (int i = 0; i < abilities.length; i++) {
+            modifiers[i] = (abilities[i] - 10) / 2;
+        }
     }
 }
