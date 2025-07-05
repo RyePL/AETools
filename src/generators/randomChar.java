@@ -104,6 +104,8 @@ public class randomChar {
         String actions = "";
         String bonusActions = "";
         String reactions = "";
+        String spells = "";
+        String spellDetails = "";
 
         if (charClass.equals("Barbarian")) {
             if (subClassIndex == 1) subClass = "Path of the Aether Transformation";
@@ -194,7 +196,7 @@ public class randomChar {
                 features += "Indomitable Might: STR is floor for STR checks and saves.\n";
             }
             if (level >= 19) {
-                features += "Epic Booon: Choose one that is appropriate.\n";
+                features += "Epic Boon: Choose one that is appropriate.\n";
             }
             if (level >= 20) {
                 statValues[0] += 4;
@@ -207,7 +209,67 @@ public class randomChar {
             basicAttack = "Greataxe: +" + (statMods[0] + proficiencyBonus) + " to hit, 1d12 + " + (statMods[0] + rageDamage) + " slashing";
         }
         else if (charClass.equals("Bard")) {
+            if (subClassIndex == 1) subClass = "College of the Blade Dancer";
+            else subClass = "College of Shantyfolk";
+            String[] possibleSpells = {"Bless", "Bane", "Dissonant Whispers", "Sleep", "Color Spray",
+                                        "Cloud of Daggers", "Heat Metal",
+                                        "Siren's Call", "Galvanizing Words", "Aetheric Communion",
+                                        "Dimension Door", "Polymorph",
+                                        "Awaken", "Mass Cure Wounds", "Planar Binding",
+                                        "Guards and Wards",
+                                        "Mirage Arcane",
+                                        "Befuddlement",
+                                        "Mass Dominate Person",
+                                        "Seeming", "Irresistable Dance", "Regenerate"};
+            
+            // Features
+            if (level >= 19) features += "Epic Boon: Choose an appropriate boon.\nWords of Creation: Can cast Power Word Heal and Power Word Kill and dual-target within 10 ft.\n";
 
+            // Actions (none in table)
+            // Bonus Actions
+            String bardicDie = "d6";
+            if (level >= 5) bardicDie = "d8";
+            if (level >= 10) bardicDie = "d10";
+            if (level >= 15) bardicDie = "d12";
+            bonusActions += "Bardic Inspiration: Grant an ally a " + bardicDie + " to apply to a failed d20 roll.\n";
+
+            // Actions
+            
+            // Reactions
+            if (level >= 7) reactions += "Countercharm: When an ally fails a mental save, force a reroll.\n";
+
+            // Ability Improvements
+            if (level >= 6) {
+                abilityImprovement(statValues, 5, 1);
+                updateModifiers(statValues, statMods);
+            }
+            if (level >= 8) {
+                abilityImprovement(statValues, 5, 1);
+                updateModifiers(statValues, statMods);
+            }
+            if (level >= 12) {
+                abilityImprovement(statValues, 5, 1);
+                updateModifiers(statValues, statMods);
+            }
+            if (level >= 16) {
+                abilityImprovement(statValues, 5, 1);
+                updateModifiers(statValues, statMods);
+            }
+
+            hitPoints = 8 + ((level - 1) * (5 + statMods[2]));
+            armorClass = 12 + statMods[1];
+
+            // Bard prepared spells progression
+            int[] bardPreparedSpellsByLevel = {0,4,5,6,7,9,10,11,12,14,15,16,16,17,17,18,18,19,20,21,22};
+            int preparedSpells = bardPreparedSpellsByLevel[Math.min(level, 20)];
+            // Select the first preparedSpells from possibleSpells in order
+            java.util.List<String> spellList = new java.util.ArrayList<>();
+            for (int i = 0; i < Math.min(preparedSpells, possibleSpells.length); i++) {
+                spellList.add(possibleSpells[i]);
+            }
+            spells = String.join(", ", spellList);
+            spellDetails = "Spell Attack: +" + (statMods[5] + proficiencyBonus) + ", Spell DC: " + (8 + statMods[5] + proficiencyBonus) + "\n";
+            
         }
         else if (charClass.equals("Cleric")) {
         }
@@ -238,6 +300,23 @@ public class randomChar {
         System.out.println("Bonus Actions: " + bonusActions);
         System.out.println("Actions: " + actions);
         System.out.println("Reactions: " + reactions);
+        if (!spells.equals("")) {
+            System.out.println("Spells: " + spells);
+            System.out.println("Spell Details: " + spellDetails);
+
+            // Print spell slots if any are nonzero
+            String[] ordinal = {"1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"};
+            StringBuilder slotLine = new StringBuilder();
+            for (int i = 0; i < spellSlots.length; i++) {
+                if (spellSlots[i] > 0) {
+                    if (slotLine.length() > 0) slotLine.append("; ");
+                    slotLine.append(ordinal[i]).append(" level: ").append(spellSlots[i]);
+                }
+            }
+            if (slotLine.length() > 0) {
+                System.out.println("Spell Slots: " + slotLine.toString());
+            }
+        }
     }
 
     public static String generateName() {
