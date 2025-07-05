@@ -132,7 +132,7 @@ public class randomShip {
             int starboardEmpty = countEmptySlots(starboardWeapons);
             int minSideSlots = Math.min(portEmpty, starboardEmpty);
             
-            if (minSideSlots > 0 && slotsToFill >= 2) {
+            if (minSideSlots > 0 && slotsToFill >= 2 && selectedWeapon.equals("Long Nine") == false) {
                 int sideSlotsToFill = Math.min(minSideSlots, slotsToFill / 2);
                 slotsToFill -= fillSlots(portWeapons, selectedWeapon, sideSlotsToFill);
                 slotsToFill -= fillSlots(starboardWeapons, selectedWeapon, sideSlotsToFill);

@@ -85,7 +85,7 @@ public class randomChar {
         };
         if (charClass.equals("Bard") || charClass.equals("Cleric") || charClass.equals("Druid") || charClass.equals("Sorcerer") || charClass.equals("Wizard")) {
             for (int i = 0; i < spellSlots.length; i++) {
-                spellSlots[i] = spellSlotReference[level][i];
+                spellSlots[i] = spellSlotReference[level - 1][i];
             }
         } else if ((charClass.equals("Paladin") || charClass.equals("Ranger")) && (level > 1)) {
             for (int i = 0; i < spellSlots.length; i++) {
@@ -99,13 +99,13 @@ public class randomChar {
         int subClassIndex = roll(2);
         int armorClass = 10;
         int hitPoints = 0;
-        String basicAttack = "";
         String features = "";
         String actions = "";
         String bonusActions = "";
         String reactions = "";
         String spells = "";
         String spellDetails = "";
+        String cantrips = "";
 
         if (charClass.equals("Barbarian")) {
             if (subClassIndex == 1) subClass = "Path of the Aether Transformation";
@@ -206,11 +206,12 @@ public class randomChar {
             bonusActions = rageDescription + "\n";
             hitPoints = 12 + ((level - 1) * (7 + statMods[2]));
             armorClass = 10 + statMods[1] + statMods[2];
-            basicAttack = "Greataxe: +" + (statMods[0] + proficiencyBonus) + " to hit, 1d12 + " + (statMods[0] + rageDamage) + " slashing";
+            actions += "Greataxe: +" + (statMods[0] + proficiencyBonus) + " to hit, 1d12 + " + (statMods[0] + rageDamage) + " slashing\n";
         }
         else if (charClass.equals("Bard")) {
             if (subClassIndex == 1) subClass = "College of the Blade Dancer";
             else subClass = "College of Shantyfolk";
+            String[] possibleCantrips = {"Vicious Mockery", "Minor Illusion", "Blade Ward", "Friends"};
             String[] possibleSpells = {"Bless", "Bane", "Dissonant Whispers", "Sleep", "Color Spray",
                                         "Cloud of Daggers", "Heat Metal",
                                         "Siren's Call", "Galvanizing Words", "Aetheric Communion",
@@ -232,11 +233,38 @@ public class randomChar {
             if (level >= 10) bardicDie = "d10";
             if (level >= 15) bardicDie = "d12";
             bonusActions += "Bardic Inspiration: Grant an ally a " + bardicDie + " to apply to a failed d20 roll.\n";
-
-            // Actions
             
             // Reactions
             if (level >= 7) reactions += "Countercharm: When an ally fails a mental save, force a reroll.\n";
+
+            // Subclass features
+            if (level >= 3) {
+                if (subClassIndex == 1) {
+                    features += "Spinning Blades: Gain two-weapon fighting. Light finesse weapons gain the thrown property and return on throw.\n";
+                    features += "Piercing Troubador: Learn the resonant blades cantrip.\n";
+                }
+                else {
+                    features += "Chant of Glory: Allies with bardic inspiration gain CHA bonus to athletics and acrobatics. Max or min bardic rolls restore one use.\n";
+                    features += "Chant of Success: Short resting with an ally gives them a bardic die.\n";
+                }
+            }
+            if (level >= 6) {
+                if (subClassIndex == 1) {
+                    features += "Swift to Act: Can spend a bardic die on initiative. Gains advantage on first d20 roll of combat.\n";
+                }
+                else {
+                    features += "Chant of Hope: Final bardic die always gives the highest result.\n";
+                }
+            }
+            if (level >= 14) {
+                if (subClassIndex == 1) {
+                    bonusActions += "Cacophonous Song: Once per rest, after a throwing attack, deal 8d6 thunder damage (CON save) and deafen in 15 ft around target.\n";
+                    features += "Transcendent Vocals: Performance checks involving singing floor at 10.\n";
+                }
+                else {
+                    features += "Heartstrings: Inspiration uses increase by half proficiency. Unexpended bardic die are regained. Allies can expend bardic die to succeed on a death save.\n";
+                }
+            }
 
             // Ability Improvements
             if (level >= 6) {
@@ -258,6 +286,16 @@ public class randomChar {
 
             hitPoints = 8 + ((level - 1) * (5 + statMods[2]));
             armorClass = 12 + statMods[1];
+            if (subClassIndex != 1) armorClass = 10 + statMods[1] + statMods[5];
+
+            // Cantrip progression
+            int cantripMax = 2;
+            if (level >= 4) cantripMax++;
+            if (level >= 10) cantripMax++;
+            for (int i = 0; i < cantripMax; i++) {
+                cantrips += possibleCantrips[roll(possibleCantrips.length) - 1];
+                if (i < cantripMax - 1) cantrips += ", ";
+            }
 
             // Bard prepared spells progression
             int[] bardPreparedSpellsByLevel = {0,4,5,6,7,9,10,11,12,14,15,16,16,17,17,18,18,19,20,21,22};
@@ -295,7 +333,6 @@ public class randomChar {
         System.out.println(subClass);
         System.out.println("Hit Points: " + hitPoints);
         System.out.println("Armor Class: " + armorClass);
-        System.out.println("Basic Attack: " + basicAttack);
         System.out.println("Features: " + features);
         System.out.println("Bonus Actions: " + bonusActions);
         System.out.println("Actions: " + actions);
@@ -305,6 +342,9 @@ public class randomChar {
             System.out.println("Spell Details: " + spellDetails);
 
             // Print spell slots if any are nonzero
+            if (!cantrips.equals("")) {
+                System.out.println("Cantrips: " + cantrips);
+            }
             String[] ordinal = {"1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"};
             StringBuilder slotLine = new StringBuilder();
             for (int i = 0; i < spellSlots.length; i++) {
