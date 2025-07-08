@@ -42,6 +42,7 @@ public class randomChar {
         
         String[] classes = {"Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"};
         String[] keyStats = {"STR", "CHA", "WIS", "WIS", "STR", "DEX", "STR", "DEX", "DEX", "CHA", "CHA", "INT"};
+        String [] secondaryStats = {"CON", "DEX", "STR", "DEX", "DEX", "WIS", "CHA", "WIS", "INT", "CON", "DEX", "CON"};
         int[] keyStatRatings = new int[12];
 
         for (int i = 0; i < classes.length; i++) {
@@ -107,6 +108,25 @@ public class randomChar {
         String spellDetails = "";
         String cantrips = "";
 
+        // Ability improvements
+        int classIndex = matchIndex(classes, charClass);
+        if (level >= 4) {
+            abilityImprovement(statValues, statNames, keyStats[classIndex], secondaryStats[classIndex]);
+            updateModifiers(statValues, statMods);
+        }
+        if (level >= 8) {
+            abilityImprovement(statValues, statNames, keyStats[classIndex], secondaryStats[classIndex]);
+            updateModifiers(statValues, statMods);
+        }
+        if (level >= 12) {
+            abilityImprovement(statValues, statNames, keyStats[classIndex], secondaryStats[classIndex]);
+            updateModifiers(statValues, statMods);
+        }
+        if (level >= 16) {
+            abilityImprovement(statValues, statNames, keyStats[classIndex], secondaryStats[classIndex]);
+            updateModifiers(statValues, statMods);
+        }
+
         if (charClass.equals("Barbarian")) {
             // Subclass assignment
             if (subClassIndex == 1) subClass = "Path of the Aether Transformation";
@@ -117,22 +137,7 @@ public class randomChar {
             String rageDescription = "Rage: Basic rage benefits. ";
 
             // Ability improvements and stat updates
-            if (level >= 4) {
-                abilityImprovement(statValues, 0, 2);
-                updateModifiers(statValues, statMods);
-            }
-            if (level >= 8) {
-                abilityImprovement(statValues, 0, 2);
-                updateModifiers(statValues, statMods);
-            }
-            if (level >= 12) {
-                abilityImprovement(statValues, 0, 2);
-                updateModifiers(statValues, statMods);
-            }
-            if (level >= 16) {
-                abilityImprovement(statValues, 0, 2);
-                updateModifiers(statValues, statMods);
-            }
+            
             if (level >= 20) {
                 statValues[0] += 4;
                 statValues[2] += 4;
@@ -285,24 +290,6 @@ public class randomChar {
                 }
             }
 
-            // Ability Improvements
-            if (level >= 6) {
-                abilityImprovement(statValues, 5, 1);
-                updateModifiers(statValues, statMods);
-            }
-            if (level >= 8) {
-                abilityImprovement(statValues, 5, 1);
-                updateModifiers(statValues, statMods);
-            }
-            if (level >= 12) {
-                abilityImprovement(statValues, 5, 1);
-                updateModifiers(statValues, statMods);
-            }
-            if (level >= 16) {
-                abilityImprovement(statValues, 5, 1);
-                updateModifiers(statValues, statMods);
-            }
-
             hitPoints = 8 + ((level - 1) * (5 + statMods[2]));
             armorClass = 12 + statMods[1];
             if (subClassIndex != 1) armorClass = 10 + statMods[1] + statMods[5];
@@ -329,6 +316,135 @@ public class randomChar {
             
         }
         else if (charClass.equals("Cleric")) {
+            if (subClassIndex == 1) subClass = "Aether Domain";
+            else subClass = "Tyranny Domain";
+            int channelDivinityUses = 0;
+            int divSparkDie = 0;
+            String[] possibleCantrips = {"Thaumaturgy", "Light", "Sacred Flame", "Toll the Dead", "Spare the Dying "};
+            String[] possibleSpells = {"Cure Wounds", "Healing Word", "Bless", "Bane", "Sanctuary",
+                                        "Hold Person", "Enhance Ability",
+                                        "Chronovoyance", "Galvanizing Words", "Aetheric Communion",
+                                        "Death Ward", "Divination",
+                                        "Soul Tide", "Mass Cure Wounds", "Raise Dead",
+                                        "Harm",
+                                        "Plane Shift",
+                                        "Antimagic Field",
+                                        "Gate",
+                                        "Planar Binding", "True Seeing",  "Symbol"};
+
+            String[] domainSpells = {};
+            if (subClassIndex == 1) {
+                domainSpells = new String[] {"Faerie Fire", "Unseen Servant", "Lesser Restoration", "Misty Step",
+                                             "Hypnotic Pattern", "Spirit Guardians", "Conjure Aether Mephits", "Wall of Aether",
+                                             "Conjure Aether Elementals", "Legend Lore"};
+            }
+            else {
+                domainSpells = new String[] {"Charm Person", "Comprehend Languages", "Detect Thoughts", "Enthrall",
+                                             "Fear", "Tongues", "Compulsion", "Dominate Beast", "Dominate Person", "Modify Memory"};
+            }
+            int numDomainSpells = 0;
+            if (level >= 3) numDomainSpells += 4;
+            if (level >= 5) numDomainSpells += 2;
+            if (level >= 7) numDomainSpells += 2;
+            if (level >= 9) numDomainSpells += 2;
+
+            
+
+            // Cantrip progression
+            int cantripMax = 3;
+            if (level >= 4) cantripMax++;
+            if (level >= 10) cantripMax++;
+            for (int i = 0; i < cantripMax; i++) {
+                cantrips += possibleCantrips[roll(possibleCantrips.length) - 1];
+                if (i < cantripMax - 1) cantrips += ", ";
+            }
+
+            // Set Cleric resource values based on level
+            if (level >= 18) {
+                channelDivinityUses = 4;
+                divSparkDie = 4;
+            } else if (level >= 13) {
+                channelDivinityUses = 3;
+                divSparkDie = 3;
+            } else if (level >= 7) {
+                channelDivinityUses = 3;
+                divSparkDie = 2;
+            } else if (level >= 1) {
+                channelDivinityUses = 2;
+                divSparkDie = 1;
+            }
+
+            if (level >= 2) {
+                features += "Channel Divinity: " + channelDivinityUses + " uses per day\n";
+                actions += "Channel Divinity Divine Spark: Roll " + divSparkDie + "d8 and either heal or deal radiant or necrotic damage on a CON save.\n";
+            }
+
+            // Cleric feature progression
+            if (level >= 1) {
+                features += "Thaumaturge: Choose an extra cantrip\n";
+            }
+            if (level >= 6) {
+                features += "Potent Spellcasting: Cantrips add WIS.\n";
+            }
+            if (level >= 10) {
+                features += "Divine Intervention: Cast a level 5 or lower spell for free.\n";
+            }
+            if (level >= 13) {
+                features += "Blessed Spellcasting: give double WIS THP on cantrip damage.\n";
+            }
+            if (level >= 19) {
+                features += "Epic Boon: Choose an appropriate Epic Boon\n";
+            }
+            if (level == 20) {
+                features += "Greater Divine Intervention: Can cast Wish with DI.\n";
+            }
+
+            // Cleric subclass features
+            if (level >= 3) {
+                if (subClassIndex == 1) {
+                    features += "Aetheric Resilience: Gain the aether shroud cantrip. Can float in aether.\n";
+                    reactions += "Surge of the Starlight Sea: Give a creature advantage on a spell save.\n";
+                    actions += "Channel Divinity Aetherial Shroud: Target makes a DEX save against 2d6 + " + level + " force damage and restraint.\n";
+                }
+                else {
+                    features += "Oppressive Smite: Creatures hit with weapon attacks can't take reactions.\n";
+                    actions += "Channel Divinity Bonds of Tyranny: WIS creatures make a WIS throw or become incapacitated for 1 turn.\n";
+                }
+            }
+            if (level >= 6) {
+                if (subClassIndex == 1) {
+                    actions += "Channel Divinity Manifest Consciousness: Cast Spirit Guardians that doubles as Detect Thoughts.\n";
+                }
+                else {
+                    features += "Adamantine Mind: Resistant to psychic damage and immune to charm effects.\n";
+                }
+            }
+            if (level >= 17) {
+                if (subClassIndex == 1) {
+                    features += "Limitless Surge: Surge of the Starlight Sea can be used three times per day.\n";
+                }
+                else {
+                    features += "Inescapable Subjugation: Gain the Mass Dominate Person spell. Enemies have disadvantage on charm saves.\n";
+                }
+            }
+
+            // Cleric prepared spells progression
+            int[] clericPreparedSpellsByLevel = {0,4,5,6,7,9,10,11,12,14,15,16,16,17,17,18,18,19,20,21,22};
+            int preparedSpells = clericPreparedSpellsByLevel[Math.min(level, 20)];
+            // Select the first preparedSpells from possibleSpells in order
+            java.util.List<String> spellList = new java.util.ArrayList<>();
+            for (int i = 0; i < Math.min(preparedSpells, possibleSpells.length); i++) {
+                spellList.add(possibleSpells[i]);
+            }
+            for (int i = 0; i < numDomainSpells; i++) {
+                spellList.add(domainSpells[roll(domainSpells.length) - 1]);
+            }
+            spells = String.join(", ", spellList);
+            spellDetails = "Spell Attack: +" + (statMods[4] + proficiencyBonus) + ", Spell DC: " + (8 + statMods[4] + proficiencyBonus) + "\n";
+            
+            // Hit Points and Armor Class
+            hitPoints = 8 + ((level - 1) * (5 + statMods[2]));
+            armorClass = 14 + Math.max(statMods[1], 2);
         }
         else if (charClass.equals("Druid")) {
         }
@@ -530,15 +646,19 @@ public class randomChar {
         return items[items.length - 1];
     }
 
-    private static void abilityImprovement(int[] abilities, int firstIndex, int secondIndex) {
+    private static void abilityImprovement(int[] abilities, String[] statNames, String firstStat, String secondStat) {
         int increases = 2;
-
-        // Prioritize first index, apply up to two increases if possible
+        
+        // Find indices for the stat names
+        int firstIndex = matchIndex(statNames, firstStat);
+        int secondIndex = matchIndex(statNames, secondStat);
+        
+        // Prioritize first stat, apply up to two increases if possible
         int canIncreaseFirst = Math.min(20 - abilities[firstIndex], increases);
         abilities[firstIndex] += canIncreaseFirst;
         increases -= canIncreaseFirst;
 
-        // Then second index (if not the same as first)
+        // Then second stat (if not the same as first)
         if (increases > 0 && secondIndex != firstIndex && abilities[secondIndex] < 20) {
             abilities[secondIndex]++;
             increases--;
