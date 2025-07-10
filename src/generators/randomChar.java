@@ -447,8 +447,207 @@ public class randomChar {
             armorClass = 14 + Math.max(statMods[1], 2);
         }
         else if (charClass.equals("Druid")) {
+            if (subClassIndex == 1) subClass = "Circle of the Feathered Stars";
+            else subClass = "Circle of the Elements";
+            String[] possibleCantrips = {"Peal of Thunder", "Druidcraft", "Primal Savagery", "Message"};
+            String[] possibleSpells = {"Primal Squall", "Entangle", "Thunderwave", "Cure Wounds", "Detect Magic",
+                                        "Aetheric Adaptation", "Summon Primordial Minion",
+                                        "Conjure Aether Mephits", "Wall of Aether", "Sleet Storm",
+                                        "Conjure Aether Elemental", "Fire Shield",
+                                        "Soul Tide", "Maelstrom", "Insect Plague",
+                                        "Hive Mind",
+                                        "Create Elemental Portal",
+                                        "Animal Shapes",
+                                        "Foresight",
+                                        "Contagion", "Investiture of Flame",  "Regenerate"};
+
+            int wildShapeUses = 0;
+            int cantripMax = 2;
+
+            String[] featheredStarsSpells = {"Darkness", "Lesser Restoration", "Aetheric Communion", "Tongues",
+                                            "Control Water", "Freedom of Movement", "Greater Restoration", "Telepathic Bond"};
+            int numFeatheredStarsSpells = 0;
+            if (level >= 3) numFeatheredStarsSpells += 2;
+            if (level >= 5) numFeatheredStarsSpells += 2;
+            if (level >= 7) numFeatheredStarsSpells += 2;
+            if (level >= 9) numFeatheredStarsSpells += 2;
+
+            // Druid progression table logic (grouped by variable)
+            // wildShapeUses progression
+            if (level >= 17) {
+                wildShapeUses = 4;
+            } else if (level >= 6) {
+                wildShapeUses = 3;
+            } else if (level >= 1) {
+                wildShapeUses = 2;
+            }
+
+            // cantripMax progression
+            if (level >= 10) {
+                cantripMax = 4;
+            } else if (level >= 4) {
+                cantripMax = 3;
+            } else if (level >= 1) {
+                cantripMax = 2;
+            }
+
+            // features progression
+            if (level >= 1) {
+                features += "Magician: Gain a bonus cantrip and add WIS to Arcana and Nature checks.\n";
+            }
+            if (level >= 4) {
+                features += "Wild Resurgence: Can exchange spell slots for wildshape uses. Can exchange wildshape use for level 1 slot once per day.\n";
+            }
+            if (level >= 6) {
+                features += "Elemental Fury: Add WIS to cantrips.\n";
+            }
+            if (level >= 15) {
+                features += "Improved Elemental Fury: Cantrip range extended by 300 ft.\n";
+            }
+            if (level >= 17) {
+                features += "Beast Spells: Can cast in beast form.\n";
+            }
+            if (level >= 19) {
+                features += "Epic Boon: Gain an appropriate Epic Boon.\n";
+            }
+            if (level >= 20) {
+                features += "Archdruid: Gain a wildshape use on initiative. Can convert wildshape uses into 2 levels of spell slots.\n";
+            }
+
+            // actions progression
+            if (level >= 1) {
+                actions += "Wild Shape: Change into a beast form\n";
+            }
+
+            // Druid subclass-specific features (Circle of the Elements)
+            if (subClassIndex == 1) {
+                if (level >= 2) {
+                    bonusActions += "Power of the Ancient Guardians: Expend a wildshape use to raise AC to 16, gain blindsight and swim speed, and add 1d4 radiant to all attacks.\n";
+                }
+                if (level >= 5) {
+                    features += "Mythical Aspect: Gain nonmagical physical resistance while PotAG is active. PotAG AC to 17 and damage to 1d6.\n";
+                }
+                if (level >= 9) {
+                    reactions += "Sheltering Arms: Give disadvantage on an attack roll against a nearby ally. In PotAG form, ally also has resistance.\n";
+                }
+                if (level >= 10) {
+                    features += "PotAG AC to 18 and damage to 1d8.\n";
+                }
+                if (level >= 13) {
+                    actions += "Radiant Wrath: once per rest, enemies within 60 ft. make a CON throw against 4d6 radiant and blind.\n";
+                }
+                if (level >= 14) {
+                    features += "PotAG AC to 19 and damage to 1d10.\n";
+                }
+            }
+            else {
+                if (level >= 1) {
+                    features += "Voice of the Planes: Add an elemental or aether cantrip.\n";
+                }
+                if (level >= 2) {
+                    actions += "Planar Conduit: Spend a wildshape use to deal 2d6 acid, cold, fire, lightning, or thunder damage in a 30 ft line. Can walk through it to teleport up to 90 ft., ending it.\n";
+                    bonusActions += "Realign Conduit: When Planar Conduit is active, make a ranged spell attack for 1d6 + WIS.\n";
+                }
+                if (level >= 5) {
+                    reactions += "Elemental Erosion: Up to WIS times, force a reroll on an elemental save.\n";
+                }
+                if (level >= 9) {
+                    bonusActions += "Rolling Fog: Obscuring fog pours form portal, creatures choke on CON save. Maintain on bonus action.\n";
+                }
+                if (level >= 14) {
+                    features += "Amplified Aether: Elemental cantrips deal max damage. Once per rest, elemental spells reroll 1s and 2s.\n";
+                }
+            }
+
+            // Druid prepared spells progression
+            int[] druidPreparedSpellsByLevel = {0,4,5,6,7,9,10,11,12,14,15,16,16,17,17,18,18,19,20,21,22};
+            int preparedSpells = druidPreparedSpellsByLevel[Math.min(level, 20)];
+            // Select the first preparedSpells from possibleSpells in order
+            java.util.List<String> spellList = new java.util.ArrayList<>();
+            for (int i = 0; i < Math.min(preparedSpells, possibleSpells.length); i++) {
+                spellList.add(possibleSpells[i]);
+            }
+            for (int i = 0; i < numFeatheredStarsSpells; i++) {
+                spellList.add(featheredStarsSpells[roll(featheredStarsSpells.length) - 1]);
+            }
+            spells = String.join(", ", spellList);
+            spellDetails = "Spell Attack: +" + (statMods[4] + proficiencyBonus) + ", Spell DC: " + (8 + statMods[4] + proficiencyBonus) + "\n";
+            
+            // Hit Points and Armor Class
+            hitPoints = 8 + ((level - 1) * (5 + statMods[2]));
+            armorClass = 12 + Math.max(statMods[1], 2);
         }
         else if (charClass.equals("Fighter")) {
+            if (subClassIndex == 1) subClass = "Battle Commander";
+            else subClass = "Corsair";
+            int secondWindUses = 2;
+            int attacks = 1;
+
+            // --- secondWindUses ---
+            if (level >= 1) secondWindUses = 2;
+            if (level >= 9) secondWindUses = 3;
+            if (level >= 17) secondWindUses = 4;
+
+            // --- attacks ---
+            if (level >= 5) attacks = 2;
+            if (level >= 11) attacks = 3;
+            if (level >= 20) attacks = 4;
+
+            // --- extra ability improvements ---
+            if (level >= 6) {
+                abilityImprovement(statValues, statNames, keyStats[classIndex], secondaryStats[classIndex]);
+                updateModifiers(statValues, statMods);
+            }
+            if (level >= 14) {
+                abilityImprovement(statValues, statNames, keyStats[classIndex], secondaryStats[classIndex]);
+                updateModifiers(statValues, statMods);
+            }
+
+            // --- features ---
+            if (level >= 2) features += "Action Surge: Gain an extra action.\n";
+            if (level >= 4) features += "Tactical Shift: On SW, move half speed without opportunity attacks.\n";
+            if (level >= 9) features += "Indomitable: Reroll a save with +level.\n";
+            if (level >= 13) features += "Extra Indomitable use.\n";
+            if (level >= 13) features += "Studied Attacks: On a miss, gain advantage on the next attack.\n";
+            if (level >= 17) features += "Extra Action Surge and Indomitable use.\n";
+            if (level >= 19) features += "Epic Boon: Choose an appropriate Epic Boon.\n";
+
+            // --- bonusActions ---
+            if (level >= 1) bonusActions += "Second Wind: Gain 1d10 + level hit points.\n";
+
+            // --- reactions ---
+            if (level >= 1) reactions += "Tactical Mind: Expend SW to add 1d10 to skill check.\n";
+
+            // --- basic actions ---
+            if (attacks > 1) actions += "Multiattack: Make " + attacks + " attacks.\n";
+            actions += "Longsword: +" + statMods[0] + " to hit, 1d8 + " + statMods[0] + " damage.\n";
+
+            // Battle Commander subclass table features, actions, bonusActions, and reactions
+            if (subClassIndex == 1) {
+                // --- features ---
+                if (level >= 3) features += "Direct the Attack: Swap initiative with an ally and give them one attack advantage.\n";
+                if (level >= 3) actions += "Defensive Formation: Give self and allies physical resistance.\n";
+                if (level >= 3) bonusActions += "Direct the Assault: Ally makes a melee attack.\n";
+                if (level >= 3) reactions += "Fall back: When an ally takes damage, they move half speed without opportunity attacks.\n";
+                if (level >= 7) features += "Inspiring Presence: Give allies + " + proficiencyBonus + " to WIS, INT, and CHA throws for 1 minute.\n";
+                if (level >= 10) features += "Always at the Ready: Allies have initiative advantage.\n";
+                if (level >= 15) features += "Focused Assault: On a hit, allies within 10 ft. have advantage against the target until next turn.\n";
+                if (level >= 18) features += "Sudden Assault: Once per rest, forgo an attack to command allies to use their reaction to attack with advantage an enemy within reach, critting on 15+.\n";
+            }
+            else {
+                // --- features ---
+                if (level >= 3) features += "Reckoning Force: Attack frightened enemies with advantage. Gain advantage against fright effects.\n";
+                if (level >= 3) actions += "Dreadful Shroud: Enemies within 15 ft make a DC " + (8 + statMods[0] + proficiencyBonus) + " INT throw or are frightened for 1 minute. " + statMods[0] + " uses.\n";
+                if (level >= 3) bonusActions += "Demoralize: Make an intimidation check with a STR bonus against a CHA throw. On a failure, the target is frightened until the end of the next turn.\n";
+                if (level >= 6) features += "Make Way: Opportunity attacks have disadvantage. Second Wind has an additional use.\n";
+                if (level >= 9) features += "Unyielding Resolve: Immune to fright. Frightened creatures take +prof damage.\n";
+                if (level >= 14) features += "Ruthless Determination: Can choose to automatically succeed with Indomitable.\n";
+                if (level >= 18) reactions += "Give No Quarter: On a killing blow or crit, gain 20 THP, move half speed, and attack.\n";
+            }
+
+            // --- hit points ---
+            hitPoints = 10 + ((level - 1) * (6 + statMods[2]));
+            armorClass = 21;
         }
         else if (charClass.equals("Monk")) {
         }
@@ -464,6 +663,8 @@ public class randomChar {
         }
         else if (charClass.equals("Wizard")) {
         }
+
+        
 
         System.out.println(subClass);
         System.out.println("Hit Points: " + hitPoints);
