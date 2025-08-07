@@ -647,9 +647,68 @@ public class randomChar {
 
             // --- hit points ---
             hitPoints = 10 + ((level - 1) * (6 + statMods[2]));
-            armorClass = 21;
+            armorClass = 17;
+            if (level >= 5) armorClass += 2;
+            if (level >= 10) armorClass += 2;
         }
         else if (charClass.equals("Monk")) {
+            if (subClassIndex == 1) subClass = "Way of the Ascetic";
+            else subClass = "Way of the Conduit";
+            int focusPoints = 0;
+            String martialArts = "d6";
+            int unarmoredMovement = 0;
+
+            if (level > 1) focusPoints = level;
+
+            if (level >= 5) martialArts = "d8";
+            if (level >= 11) martialArts = "d10";
+            if (level >= 17) martialArts = "d12";
+
+            if (level >= 2) unarmoredMovement += 10;
+            if (level >= 6) unarmoredMovement += 5;
+            if (level >= 10) unarmoredMovement += 5;
+            if (level >= 14) unarmoredMovement += 5;
+            if (level >= 18) unarmoredMovement += 5;
+
+            // --- martial arts ---
+            if ((level >= 2) && (level < 10)) {
+                bonusActions += "Flurry of Blows: Spend a focus point to make two unarmed attacks.\n";
+                bonusActions += "Patient Defense: Disengage. Can spend a focus point to also Dodge.\n";
+                bonusActions += "Step of the Wind: Dash. Can spend a focus point to also Disengage.\n";
+            }
+            else if (level >= 10) {
+                bonusActions += "Flurry of Blows: Spend a focus point to make two unarmed attacks, or two points to make three.\n";
+                bonusActions += "Patient Defense: Disengage. Can spend a focus point to also Dodge and gain 2 " + martialArts + " temp HP.\n";
+                bonusActions += "Step of the Wind: Dash. Can spend a focus point to also Disengage and move a willing creature with you.\n";
+            }
+
+            // Monk class table features and bonusActions
+            // --- features ---
+            if (level >= 1) features += "Uncanny Metabolism: Once per day, regain all focus on initiative and ? Hit points.\n";
+            if (level >= 4) features += "Slow Fall: Reduce fall damage by 5x level.\n";
+            if (level >= 5) features += "Stunning Strike: On a hit, expend a focus point and target makes a CON save. Stunned on fail, half speed and one advantage attack on success.\n";
+            if (level >= 6) features += "Empowered Strikes: Strikes can deal force damage.\n";
+            if (level >= 7) features += "Evasion: Take no damage on successful DEX saves and half on failures.\n";
+            if (level >= 9) features += "Acrobatic Movement: Can run up walls and across liquids.\n";
+            if (level >= 10) features += "Self-Restoration: Can end one charmed, frightened, or poisoned condition at the end of a turn.\n";
+            if (level >= 13) features += "Deflect Energy: Deflect Attacks works on any damage type.\n";
+            if (level >= 14) features += "Disciplined Survivor: Grant proficiency on all saves. Can spend a focus point to reroll a save.\n";
+            if (level >= 15) features += "Perfect Focus: If Uncanny Metabolism is used, set focus to 4.\n";
+            if (level >= 18) features += "Superior Defense: Spend 3 focus to gain resistance to all damage except force.\n";
+            if (level >= 19) features += "Epic Boon: Choose an appropriate Epic Boon.\n";
+
+            // --- actions ---
+            if (level >= 5) actions += "Multiattack: Make two attacks.\n";
+            actions += "Unarmed Strike: +" + statMods[1] + " to hit, 1" + martialArts + " + " + statMods[1] + " damage.\n";
+
+            // --- bonusActions ---
+            if (level >= 1) bonusActions += "Martial Arts: Make an unarmed attack.\n";
+
+            // --- reactions ---
+            if (level >= 3) reactions += "Deflect Attacks: Reduce a physical attack by 1d10 + DEX + level. If it hits 0, can spend a focus point to deal 2d? Damage on a DEX save.\n";
+
+
+            
         }
         else if (charClass.equals("Paladin")) {
         }
