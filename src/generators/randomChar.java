@@ -707,7 +707,38 @@ public class randomChar {
             // --- reactions ---
             if (level >= 3) reactions += "Deflect Attacks: Reduce a physical attack by 1d10 + DEX + level. If it hits 0, can spend a focus point to deal 2d? Damage on a DEX save.\n";
 
-
+            // Way of the Ascetic subclass table features, actions, bonusActions, and reactions
+            if (subClassIndex == 1) {
+                if (level >= 3) {
+                    features += "Fragile Objects: Can expend a focus point to ignore an object's resistances on hit.\n";
+                    features += "Construct Bane: Can expend a focus point on hitting a construct to strike a critical hit.\n";
+                    reactions += "Ignore the Blade: Reduce physical damage by " + proficiencyBonus + ".\n";
+                }
+                if (level >= 6) actions += "Value in Utility: Spend a focus point to convert a weapon to wood and glass, or two points for a magical weapon.\n";
+                if (level >= 11) bonusActions += "Insubstantial Matter: Spend a focus point to gain physical resistance and pass through solid matter for a turn.\n";
+                if (level >= 17) {
+                    bonusActions += "Polymorph: Spend 4 focus points to cast polymorph, mainting each round for one focus point.\n";
+                    features += "There is no Spoon: Fragile Objects does not cost focus.\n";
+                    features += "Repurpose Energy: Regain " + proficiencyBonus + " focus when destroying a construct.\n";
+                }
+            // Way of the Conduit subclass table features, actions, bonusActions, and reactions
+            }
+            else {
+                if (level >= 3) {
+                    bonusActions += "Asteth's Brand: Spend a focus point to gain cold and fire resistance, and ignore environmental exhaustion.\n";
+                    bonusActions += "Cyrill's Guilt: Spend a focus point to take on another creature's negative condition.\n";
+                }
+                if (level >= 6) {
+                    features += "Night's Flame: Spend 1-3 focus on hit to deal 2d6 fire damage per point spent. This damage repeats next turn unless the enemy spends their reaction.\n";
+                    features += "Starry Zephyr: Spend 1-3 focus on hit to push 10 ft. per point spent and knock prone, dealing 1d6 damage per 10 ft. moved if an object or creature is struck.\n";
+                }
+                if (level >= 11) {
+                    features += "Guidance of the Stars: On Night's Flame, the target makes a WIS save or is incapacitated on their turn. On Starry Zephyr, the target makes a WIS save or is restrained on their turn.\n";
+                }
+                if (level >= 17) {
+                    features += "Astral Form: On Night's Flame or Starry Zephyr, gain one elemental immunity for 1 minute, 60 ft. truesight, fly speed, and opportunity attack immunity. Recharges on rest.\n";
+                }
+            }
             
         }
         else if (charClass.equals("Paladin")) {
