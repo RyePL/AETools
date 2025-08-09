@@ -28,7 +28,7 @@ public class randomChar {
         String[][] qualities = {
             {"Beefy", "Muscular", "Slight", "Frail"},
             {"Nimble", "Quick", "Slow", "Clumsy"},
-            {"Resolute", "Stout", "Weak", "Sickly"},
+            {"Resolute", "Stout", "Frail", "Sickly"},
             {"Razor-Sharp", "Bright", "Dim", "Slow"},
             {"Deepened", "Aware", "Aloof", "Unaware"},
             {"Magnetic", "Charming", "Unpleasant", "Unlikeable"}
@@ -37,7 +37,7 @@ public class randomChar {
         String[] secondaryQualities = {
             "Eye patch", "Old", "Stylish", "Scarred", "Tattooed", "Bald", "Long hair", "Bearded", 
             "Clean-shaven", "Pierced", "Wrinkled", "Young", "Tanned", "Pale", "Freckled", 
-            "Muscular", "Slender", "Tall", "Short", "Broad-shouldered", "Limping", "Missing finger"
+            "Large", "Slender", "Tall", "Short", "Broad-shouldered", "Limping", "Missing finger"
         };
         
         // Direct mapping for quality index
@@ -73,6 +73,9 @@ public class randomChar {
 
         // Select character class using weighted random selection with keyStatRatings as weights
         String charClass = weightedRandomSelect(classes, keyStatRatings);
+
+        // debug to force class
+        charClass = "Ranger";
 
         // Determine level based on stats
         // "classQuality" is the modifier of the key stat for the class, floor 1
@@ -911,6 +914,134 @@ public class randomChar {
             if (level >= 8) armorClass += 2;
         }
         else if (charClass.equals("Ranger")) {
+            if (subClassIndex == 1) subClass = "Aether Prowler";
+            else subClass = "Expanse Wayfinder";
+
+            String[] possibleSpells = {"Hunter's Mark", "Alarm", "Cure Wounds", "Ensnaring Strike",
+            "Cordon of Arrows", "Aetheric Adaptation",
+            "Flame Arrows", "Elemental Adaptation", "Speak with Plants",
+            "Freedom of Movement", "Grasping Vine",
+            "Steel Wind Strike", "Conjure Volley", "Wrath of Nature"};
+
+            int favoredEnemyUses = 2;
+            String[] wardenSpells;
+            int numWardenSpells = 0;
+            if (level >= 3) numWardenSpells += 1;
+            if (level >= 5) numWardenSpells += 1;
+            if (level >= 9) numWardenSpells += 1;
+            if (level >= 13) numWardenSpells += 1;
+            if (level >= 17) numWardenSpells += 1;
+
+            if (level >= 5) favoredEnemyUses += 1;
+            if (level >= 9) favoredEnemyUses += 1;
+            if (level >= 13) favoredEnemyUses += 1;
+            if (level >= 17) favoredEnemyUses += 1;
+            bonusActions += "Favored Enemy (" + favoredEnemyUses + "/day): Cast Hunter's Mark without a spell slot.\n";
+
+            // Features progression
+            if (level >= 2) {
+                features += "Druidic Warrior: Learn the Mending and Gust cantrips.\n";
+            }
+            if (level >= 6) {
+                features += "Roving: Increase speed by 10 ft., gain equal climb and swim speed.\n";
+            }
+            if (level >= 13) {
+                features += "Relentless Hunter: Hunter's Mark ignores concentration saves.\n";
+            }
+            if (level >= 17) {
+                features += "Precise Hunter: Advantage against enemies targeted by Hunter's Mark.\n";
+            }
+            if (level >= 18) {
+                features += "Feral Senses: Blindsight up to 30 ft.\n";
+            }
+            if (level >= 19) {
+                features += "Epic Boon: Choose an appropriate epic boon.\n";
+            }
+            if (level >= 20) {
+                features += "Foe Slayer: Hunter's Mark uses d10 die instead of d6.\n";
+            }
+
+            // Actions progression
+            if (level >= 5) {
+                actions += "Multiattack: Attack twice.\n";
+            }
+            if (level >= 10) {
+                actions += "Tireless (WIS/day): Gain 1d8 + WIS temporary HP.\n";
+            }
+
+            // Bonus Actions progression
+            if (level >= 14) {
+                bonusActions += "Nature's Veil (WIS/day): Become invisible until the end of the next turn.\n";
+            }
+
+            // Subclass 1: Aether Prowler
+            if (subClassIndex == 1) {
+                wardenSpells = new String[] {"Sleep", "Blur", "Blink", "Confusion", "Hold Monster"};
+                
+                // Aetherial Attack progression
+                if (level >= 3) {
+                    bonusActions += "Aetherial Attack: Imbue a weapon with aether for 1 minute. It deals +";
+                    if (level >= 11) bonusActions += "2d6 psychic damage.\n";
+                    else bonusActions += "1d6 psychic damage.\n";
+                }
+
+                // Features progression
+                if (level >= 3) {
+                    features += "Starlit Suffusion: Can breathe aether.\n";
+                }
+                if (level >= 7) {
+                    features += "Astral Affinity: Movement speed is doubled in the aether or Aether Smog.\n";
+                }
+                if (level >= 11) {
+                    features += "Empowered Miasma: Enemies in Aether Smog have disadvantage on spell saves.\n";
+                }
+                
+                // Bonus Actions progression
+                if (level >= 3) {
+                    bonusActions += "Aether Smog: Create a 60 ft. emanation of harmless aether that heavily obscures for all other creatures for 1 minute.\n";
+                }
+                
+                // Reactions progression
+                if (level >= 15) {
+                    reactions += "Arcane Absorption (prof/day): On spell damage, gain temporary HP equal to half the damage.\n";
+                }
+            }
+            // Subclass 2: Expanse Wayfinder
+            else {
+                wardenSpells = new String[] {"Comprehend Languages", "Gust of Wind", "Tongues", "Locate Creature", "Legend Lore"};
+
+                // Features progression
+                if (level >= 3) {
+                    features += "Corsair of the Aetherial Waves: Expertise in Athletics and Acrobatics. First weapon attack per round deals +1d6 damage.\n";
+                }
+                if (level >= 7) {
+                    features += "Warp and Weave: After moving at least 5 ft, increase armor class by 1 and opportunity attack disadvantage until the next turn.\n";
+                }
+                if (level >= 11) {
+                    features += "Taking the Plunge: Increase swim speed by 10 ft. Advantage on breath and aether poisoning saves.\n";
+                }
+                if (level >= 15) {
+                    features += "Aether in the Blood: Immune to aether poisoning, swim speed increased by 10 ft. Can cast misty step at will while submerged.\n";
+                }
+            }
+
+            // Ranger prepared spells progression
+            int[] rangerPreparedSpellsByLevel = {0,0,0,4,5,6,6,7,7,9,9,10,10,11,11,12,12,14,14,15,15};
+            int preparedSpells = rangerPreparedSpellsByLevel[Math.min(level, 20)];
+            // Select the first preparedSpells from possibleSpells in order
+            java.util.List<String> spellList = new java.util.ArrayList<>();
+            for (int i = 0; i < Math.min(preparedSpells, possibleSpells.length); i++) {
+                spellList.add(possibleSpells[i]);
+            }
+            for (int i = 0; i < numWardenSpells; i++) {
+                spellList.add(wardenSpells[roll(wardenSpells.length) - 1]);
+            }
+            spells = String.join(", ", spellList);
+            spellDetails = "Spell Attack: +" + (statMods[4] + proficiencyBonus) + ", Spell DC: " + (8 + statMods[4] + proficiencyBonus) + "\n";
+            
+            // Hit Points and Armor Class
+            hitPoints = 10 + ((level - 1) * (6 + statMods[2]));
+            armorClass = 12 + statMods[1];
         }
         else if (charClass.equals("Rogue")) {
         }
