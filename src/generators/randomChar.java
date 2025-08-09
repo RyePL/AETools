@@ -52,6 +52,11 @@ public class randomChar {
         // Select character class using weighted random selection with keyStatRatings as weights
         String charClass = weightedRandomSelect(classes, keyStatRatings);
 
+        // Determine level based on stats
+        // "classQuality" is the modifier of the key stat for the class, floor 1
+        // "reverseQuality" is the modifier of the character's worst stat, ceiling 0
+        // level is a d4 for classQuality minus a d4 for reverseQuality
+        // for example, a barbarian with STR 18 and a worst stat of 8 has a level of 4d4 - 1d4, total range 1-15
         int classQuality = Math.max(statMods[matchIndex(statNames, keyStats[matchIndex(classes, charClass)])], 1);
         int reverseQuality = Math.max(-statMods[worstStatIndex], 0);
         int level = multiRoll(4, classQuality) - multiRoll(4, reverseQuality);
@@ -613,10 +618,10 @@ public class randomChar {
             if (level >= 19) features += "Epic Boon: Choose an appropriate Epic Boon.\n";
 
             // --- bonusActions ---
-            if (level >= 1) bonusActions += "Second Wind: Gain 1d10 + level hit points.\n";
+            if (level >= 1) bonusActions += "Second Wind: Gain 1d10 + " + level + " hit points.\n";
 
             // --- reactions ---
-            if (level >= 1) reactions += "Tactical Mind: Expend SW to add 1d10 to skill check.\n";
+            if (level >= 2) reactions += "Tactical Mind: Expend SW to add 1d10 to skill check.\n";
 
             // --- basic actions ---
             if (attacks > 1) actions += "Multiattack: Make " + attacks + " attacks.\n";
@@ -740,8 +745,148 @@ public class randomChar {
                 }
             }
             
+            // Hit Points and Armor Class
+            hitPoints = 8 + ((level - 1) * (5 + statMods[2]));
+            armorClass = 10 + statMods[1] + statMods[4];
         }
         else if (charClass.equals("Paladin")) {
+            if (subClassIndex == 1) subClass = "Oath of the Sovereign";
+            else subClass = "Oath of the Drakes";
+
+            String[] possibleSpells = {"Divine Smite", "Shield of Faith", "Detect Magic", "Divine Favor",
+            "Zone of Truth", "Magic Weapon",
+            "Galvanizing Words", "Revivify", "Crusader's Mantle",
+            "Death Ward", "Find Greater Steed",
+            "Greater Restoration", "Banishing Smite", "Destructive Wave"};
+
+            String[] oathSpells;
+            int channelDivinityUses = 0;
+
+            int numOathSpells = 0;
+            if (level >= 3) numOathSpells += 2;
+            if (level >= 5) numOathSpells += 2;
+            if (level >= 9) numOathSpells += 2;
+            if (level >= 13) numOathSpells += 2;
+            if (level >= 17) numOathSpells += 2;
+
+            // Level-based Paladin features, actions, and bonusActions
+            // Group 1: channelDivinityUses changes
+            if (level >= 2) {
+                channelDivinityUses = 2;
+            }
+            
+            // Group 2: features changes
+            if (level >= 2) {
+                features += "Blessed Warrior: Can cast Guidance and Spare the Dying at will.\n";
+            }
+            if (level >= 6) {
+                features += "Aura of Protection: Allies within 10 ft. have a saving throw bonus of +CHA.\n";
+            }
+            if (level >= 9) {
+                features += "Aura of Courage: Allies in the Aura of Protection are immune to fear.\n";
+            }
+            if (level >= 10) {
+                features += "Radiant Strikes: Attacks 3 deal +1d8 radiant damage.\n";
+            }
+            if (level >= 13) {
+                features += "Restoring Touch: Lay on Hands can remove most conditions.\n";
+            }
+            if (level >= 18) {
+                features += "Aura of Expansion: Aura of Protection extends 30 ft.\n";
+            }
+            if (level >= 19) {
+                features += "Epic Boon: Choose an appropriate epic boon.\n";
+            }
+            
+            // Group 3: actions changes
+            if (level >= 5) {
+                actions += "Multiattack: Attack twice.\n";
+            }
+            if (level >= 9) {
+                actions += "Abjure Foes (CD): CHA creatures within 60 ft. make a WIS save or become frightened for 1 minute and must choose one between moving, action, and bonus action.\n";
+            }
+            
+            // Group 4: bonusActions changes
+            if (level >= 1) {
+                bonusActions += "Lay on Hands: Restore hit points from a pool of 5 x level.\n";
+            }
+            if (level >= 2) {
+                bonusActions += "Paladin's Smite (1/day): Cast Divine Smite without a spell slot.\n";
+                bonusActions += "Divine Sense (CD): Sense celestials, fiends, and undead for 10 minutes.\n";
+            }
+
+            // Oath of the Sovereign subclass table features, actions, bonusActions, and reactions
+            if (subClassIndex == 1) {
+                oathSpells = new String[] {"Command", "Unseen Servant", "Find Steed", "Flame Blade",
+                                            "Magic Circle", "Protection from Energy", "Guardian of Faith", "Resilient Sphere",
+                                            "Geas", "Wall of Force"};
+
+                // Group 1: features changes
+                if (level >= 7) {
+                    features += "Exemplar of the Realm: Charisma checks floor at 10. Allies in the Aura of Protection reduce physical 7 damage by CHA.\n";
+                }
+                if (level >= 15) {
+                    features += "Glorious Strikes: Can reduce Divine Smite damage by 1d8 to deal 2d8 radiant and fright (CHA save) to enemies within 10 ft.\n";
+                }
+                
+                // Group 2: actions changes
+                if (level >= 3) {
+                    actions += "Marshalling Order (CD): Choose up to CHA creatures within 30 ft. They can use their reaction to move up to their speed without opportunity attacks.\n";
+                }
+                
+                // Group 3: reactions changes
+                if (level >= 3) {
+                    reactions += "Shield of the Realm (CD): When a creature within 30 ft. takes damage, give resistance then temporary HP equal to level.\n";
+                }
+                if (level >= 20) {
+                    reactions += "Sovereign Mastery (1/day): For 1 minute, enemies ending their turn within 10 ft. make a CHA throw or become stunned.\n";
+                }
+            }
+            else {
+                oathSpells = new String[] {"Disguise Self", "Expeditious Retreat", "Arcanist's Magic Aura", "Alter Self",
+                                           "Galvanizing Words", "Nondetection", "Aetheric Bedlam", "Greater Invisiblity",
+                                           "Soul Tide", "Passwall"};
+
+                // Group 1: features changes
+                if (level >= 3) {
+                    features += "Mariner's Mastery: Gain Deception proficiency. Divine sense can detect humanoids.\n";
+                }
+                if (level >= 6) {
+                    features += "Aura of Unbound Steps: Allies in the Aura of Protection are unaffected by difficult terrain and their speed cannot be reduced by magic.\n";
+                }
+                
+                // Group 2: actions changes
+                if (level >= 14) {
+                    actions += "Chainbreaker (CHA/day): Remove all physical and magical restraints on a creature.\n";
+                }
+                
+                // Group 3: bonusActions changes
+                if (level >= 3) {
+                    bonusActions += "Veil of the Phantom Sea (CD): Up to CHA creatures within 30 ft. gain a +5 bonus to stealth checks and DEX saves.\n";
+                }
+                if (level >= 20) {
+                    bonusActions += "Spirit of the Unfettered (1/day): For 1 minute, increase speed by 30, ignore opportunity attacks, immune to charm, and can hide or dodge as a bonus action.\n";
+                }
+            }
+            // Paladin prepared spells progression
+            int[] paladinPreparedSpellsByLevel = {0,0,0,4,5,6,6,7,7,9,9,10,10,11,11,12,12,14,14,15,15};
+            int preparedSpells = paladinPreparedSpellsByLevel[Math.min(level, 20)];
+            // Select the first preparedSpells from possibleSpells in order
+            java.util.List<String> spellList = new java.util.ArrayList<>();
+            for (int i = 0; i < Math.min(preparedSpells, possibleSpells.length); i++) {
+                spellList.add(possibleSpells[i]);
+            }
+            for (int i = 0; i < numOathSpells; i++) {
+                spellList.add(oathSpells[roll(oathSpells.length) - 1]);
+            }
+            spells = String.join(", ", spellList);
+            spellDetails = "Spell Attack: +" + (statMods[5] + proficiencyBonus) + ", Spell DC: " + (8 + statMods[5] + proficiencyBonus) + "\n";
+            
+            // Hit Points and Armor Class
+            hitPoints = 10 + ((level - 1) * (6 + statMods[2]));
+            armorClass = 16;
+            if (level >= 5) armorClass += 2;
+            if (level >= 8) armorClass += 2;
         }
         else if (charClass.equals("Ranger")) {
         }
@@ -756,7 +901,7 @@ public class randomChar {
 
         
 
-        System.out.println(subClass);
+        if (level >= 3)System.out.println(subClass);
         System.out.println("Hit Points: " + hitPoints);
         System.out.println("Armor Class: " + armorClass);
         System.out.println("Features: " + features);
