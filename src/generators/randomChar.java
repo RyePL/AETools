@@ -74,9 +74,6 @@ public class randomChar {
         // Select character class using weighted random selection with keyStatRatings as weights
         String charClass = weightedRandomSelect(classes, keyStatRatings);
 
-        // debug to force class
-        charClass = "Ranger";
-
         // Determine level based on stats
         // "classQuality" is the modifier of the key stat for the class, floor 1
         // "reverseQuality" is the modifier of the character's worst stat, ceiling 0
@@ -492,7 +489,6 @@ public class randomChar {
                                         "Contagion", "Investiture of Flame",  "Regenerate"};
 
             int wildShapeUses = 0;
-            int cantripMax = 2;
 
             String[] featheredStarsSpells = {"Darkness", "Lesser Restoration", "Aetheric Communion", "Tongues",
                                             "Control Water", "Freedom of Movement", "Greater Restoration", "Telepathic Bond"};
@@ -510,15 +506,6 @@ public class randomChar {
                 wildShapeUses = 3;
             } else if (level >= 1) {
                 wildShapeUses = 2;
-            }
-
-            // cantripMax progression
-            if (level >= 10) {
-                cantripMax = 4;
-            } else if (level >= 4) {
-                cantripMax = 3;
-            } else if (level >= 1) {
-                cantripMax = 2;
             }
 
             // features progression
@@ -546,7 +533,7 @@ public class randomChar {
 
             // actions progression
             if (level >= 1) {
-                actions += "Wild Shape: Change into a beast form\n";
+                actions += "Wild Shape (" + wildShapeUses + "/day): Change into a beast form\n";
             }
 
             // Druid subclass-specific features (Circle of the Elements)
@@ -587,6 +574,15 @@ public class randomChar {
                 if (level >= 14) {
                     features += "Amplified Aether: Elemental cantrips deal max damage. Once per rest, elemental spells reroll 1s and 2s.\n";
                 }
+            }
+
+            // Cantrip progression
+            int cantripMax = 2;
+            if (level >= 4) cantripMax++;
+            if (level >= 10) cantripMax++;
+            for (int i = 0; i < cantripMax; i++) {
+                cantrips += possibleCantrips[roll(possibleCantrips.length) - 1];
+                if (i < cantripMax - 1) cantrips += ", ";
             }
 
             // Druid prepared spells progression
@@ -643,7 +639,7 @@ public class randomChar {
             if (level >= 19) features += "Epic Boon: Choose an appropriate Epic Boon.\n";
 
             // --- bonusActions ---
-            if (level >= 1) bonusActions += "Second Wind: Gain 1d10 + " + level + " hit points.\n";
+            if (level >= 1) bonusActions += "Second Wind (" + secondWindUses + "/day): Gain 1d10 + " + level + " hit points.\n";
 
             // --- reactions ---
             if (level >= 2) reactions += "Tactical Mind: Expend SW to add 1d10 to skill check.\n";
@@ -714,6 +710,7 @@ public class randomChar {
 
             // Monk class table features and bonusActions
             // --- features ---
+            if (level >= 1) features += focusPoints + " focus points, recharge on short rest.\n";
             if (level >= 1) features += "Uncanny Metabolism: Once per day, regain all focus on initiative and ? Hit points.\n";
             if (level >= 4) features += "Slow Fall: Reduce fall damage by 5x level.\n";
             if (level >= 5) features += "Stunning Strike: On a hit, expend a focus point and target makes a CON save. Stunned on fail, half speed and one advantage attack on success.\n";
@@ -794,15 +791,24 @@ public class randomChar {
             if (level >= 13) numOathSpells += 2;
             if (level >= 17) numOathSpells += 2;
 
+            // Basic attack
+            actions += "Mace: + " + statMods[0] + " to hit, 1d8 + " + statMods[0] + " damage.\n";
+
             // Level-based Paladin features, actions, and bonusActions
             // Group 1: channelDivinityUses changes
             if (level >= 2) {
                 channelDivinityUses = 2;
             }
+            if (level >= 11) {
+                channelDivinityUses += 1;
+            }
             
             // Group 2: features changes
             if (level >= 2) {
                 features += "Blessed Warrior: Can cast Guidance and Spare the Dying at will.\n";
+            }
+            if (level >= 3) {
+                features += "Channel Divinity uses: " + channelDivinityUses + " per day\n";
             }
             if (level >= 6) {
                 features += "Aura of Protection: Allies within 10 ft. have a saving throw bonus of +CHA.\n";
