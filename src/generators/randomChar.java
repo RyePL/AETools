@@ -34,15 +34,37 @@ public class randomChar {
             {"Magnetic", "Charming", "Unpleasant", "Unlikeable"}
         };
         
+        String[] secondaryQualities = {
+            "Eye patch", "Old", "Stylish", "Scarred", "Tattooed", "Bald", "Long hair", "Bearded", 
+            "Clean-shaven", "Pierced", "Wrinkled", "Young", "Tanned", "Pale", "Freckled", 
+            "Muscular", "Slender", "Tall", "Short", "Broad-shouldered", "Limping", "Missing finger"
+        };
+        
         // Direct mapping for quality index
         int bestQualityIndex = (statMods[bestStatIndex] <= -2) ? 3 : (statMods[bestStatIndex] <= 0) ? 2 : (statMods[bestStatIndex] <= 2) ? 1 : 0;
         int worstQualityIndex = (statMods[worstStatIndex] <= -2) ? 3 : (statMods[worstStatIndex] <= 0) ? 2 : (statMods[worstStatIndex] <= 2) ? 1 : 0;
         
-        System.out.println(qualities[bestStatIndex][bestQualityIndex] + ", " + qualities[worstStatIndex][worstQualityIndex]);
+        // Generate 1-3 random secondary qualities
+        int numSecondaryQualities = roll(3); // 1-3 random items
+        java.util.List<String> selectedSecondaryQualities = new java.util.ArrayList<>();
+        java.util.List<Integer> usedIndices = new java.util.ArrayList<>();
+        
+        for (int i = 0; i < numSecondaryQualities; i++) {
+            int index;
+            do {
+                index = roll(secondaryQualities.length) - 1;
+            } while (usedIndices.contains(index));
+            usedIndices.add(index);
+            selectedSecondaryQualities.add(secondaryQualities[index]);
+        }
+        
+        String secondaryQualitiesString = String.join(", ", selectedSecondaryQualities);
+        System.out.println(qualities[bestStatIndex][bestQualityIndex] + ", " + qualities[worstStatIndex][worstQualityIndex] + ", " + secondaryQualitiesString);
         
         String[] classes = {"Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"};
         String[] keyStats = {"STR", "CHA", "WIS", "WIS", "STR", "DEX", "STR", "DEX", "DEX", "CHA", "CHA", "INT"};
         String [] secondaryStats = {"CON", "DEX", "STR", "DEX", "DEX", "WIS", "CHA", "WIS", "INT", "CON", "DEX", "CON"};
+
         int[] keyStatRatings = new int[12];
 
         for (int i = 0; i < classes.length; i++) {
