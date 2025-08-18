@@ -1184,6 +1184,20 @@ public class randomChar {
             armorClass = 12 + statMods[1];
         }
         else if (charClass.equals("Sorcerer")) {
+            if (subClassIndex == 1) subClass = "Phantom Shrouded";
+            else subClass = "Primordial Soul";
+
+            String[] possibleCantrips = {"Firebolt", "Mind Sliver", "Light", "Message", "Blade Ward", "Minor Illusion"};
+            String[] possibleSpells = {"Mage Armor", "Ice Knife", "Shield", "Sleep",
+                                       "Starlight Cannonball", "Aetheric Adaptation", "Knock",
+                                       "Siren's Call", "Summon Primordial Minion", "Fireball",
+                                       "Wall of Aether", "Storm Sphere",
+                                       "Dominate Person", "Telekinesis", "Enervation",
+                                       "Aetherial Rift",
+                                       "Finger of Death",
+                                       "Earthquake",
+                                       "Mass Dominate Person",
+                                       "Reverse Gravity", "Abi-Dalzim's Horrid Wilting", "Time Stop"};
         }
         else if (charClass.equals("Warlock")) {
         }
