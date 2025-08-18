@@ -823,7 +823,7 @@ public class randomChar {
                 features += "Restoring Touch: Lay on Hands can remove most conditions.\n";
             }
             if (level >= 18) {
-                features += "Aura of Expansion: Aura of Protection extends 30 ft.\n";
+                features += "Aura Expansion: Aura of Protection extends 30 ft.\n";
             }
             if (level >= 19) {
                 features += "Epic Boon: Choose an appropriate epic boon.\n";
@@ -1050,6 +1050,138 @@ public class randomChar {
             armorClass = 12 + statMods[1];
         }
         else if (charClass.equals("Rogue")) {
+            if (subClassIndex == 1) subClass = "Cloaked Blade";
+            else subClass = "Veiled Guardian";
+
+            int sneakAttackDie = Math.round(level / 2);
+            features += "Sneak Attack: When attacking a target with advantage or within 5 ft. of an ally, deal +" + sneakAttackDie + " damage.\n";
+
+            // Extra Ability Improvement
+            if (level >= 10) {
+                abilityImprovement(statValues, statNames, keyStats[classIndex], secondaryStats[classIndex]);
+                updateModifiers(statValues, statMods);
+            }
+
+            // Cunning Strike progression
+            String cunningStrike = "";
+            if (level >= 5) {
+                cunningStrike += "Cunning Strike: On sneak attack, spend sneak attack die on various effects.\n";
+                cunningStrike += "    Poison (1d6): Target makes a CON save. On fail, poisoned for 1 minute.\n";
+                cunningStrike += "    Trip (1d6): Target makes a DEX save. On fail, falls prone.\n";
+                cunningStrike += "    Withdraw (1d6): Move half speed without provoking opportunity attacks.\n";
+            }
+            if (level >= 14) {
+                cunningStrike += "    Daze (2d6): Target makes a CON save. On fail, it must choose between action or bonus action next turn.\n";
+                cunningStrike += "    Knock Out (6d6): Target makes a CON save. On fail, it falls unconscious for 1 minute.\n";
+                cunningStrike += "    Obscure (3d6): Target makes a DEX save. On fail, it is blinded until the end of its turn.\n";
+            }
+
+            // Features progression
+            if (level >= 1) {
+                features += "Expertise: Double proficiency in Stealth and Sleight of Hand.\n";
+            }
+            if (level >- 5) {
+                features += cunningStrike;
+            }
+            if (level >= 6) {
+                features += "Expertise: Double proficiency in Deception and Acrobatics.\n";
+            }
+            if (level >= 7) {
+                features += "Evasion: Improve DEX saves by one degree.\n";
+            }
+            if (level >= 11) {
+                features += "Improved Cunning Strike: Use two cunning strike options.\n";
+            }
+            if (level >= 15) {
+                features += "Slippery Mind: Proficiency in WIS and CHA saves.\n";
+            }
+            if (level >= 18) {
+                features += "Elusive: Immune to attack advantage.\n";
+            }
+            if (level >= 19) {
+                features += "Epic Boon: Choose an appropriate epic boon.\n";
+            }
+            if (level >= 20) {
+                features += "Stroke of Luck (1/rest): On failing a roll, instead roll a 20.\n";
+            }
+
+            // Bonus Actions progression
+            if (level >= 1) {
+                bonusActions += "Cunning Action: Dash, disengage, or hide.\n";
+            }
+
+            // Reactions progression
+            if (level >= 5) {
+                reactions += "Uncanny Dodge: Halve damage from an attack.\n";
+            }
+
+            // Subclass 1: Cloaked Blade
+            if (subClassIndex == 1) {
+                // Features progression
+                if (level >= 1) {
+                    features += "Deadly Performer: Gain Performance proficiency.\n";
+                }
+                if (level >= 8) {
+                    features += "Fleeting Form (1/day): Cast the blur spell with no concentration or material components.\n";
+                }
+                if (level >= 13) {
+                    features += "Cloak Dancer: Performance uses DEX.\n";
+                }
+                if (level >= 17) {
+                    features += "Deadly Distraction: Once per turn when hitting with Distracting Step, the target makes a WIS save. On a failure, make another attack, which can benefit from Sneak Attack a second time.\n";
+                }
+
+                // Bonus Actions progression
+                if (level >= 1) {
+                    bonusActions += "Deceptive Flourish: Contest an acrobatics or performance check against an insight check. On a success, gain Sneak Attack this turn.\n";
+                }
+
+                // Reactions progression
+                if (level >= 1) {
+                    reactions += "Distracting Step (prof/day): After a disengage, make a melee attack with advantage. Opportunity attacks have disadvantage.\n";
+                }
+                if (level >= 15) {
+                    reactions += "Flashy Dodge (prof/day): Make a performance check and treat it as AC. If the strike still hits, it does half damage.\n";
+                }
+            }
+            // Subclass 2: Veiled Guardian
+            else {
+                int numGuardianDice = Math.round(sneakAttackDie / 2);
+
+                // Features progression
+                if (level >= 3) {
+                    features += "Guardian Dice: Gain " + numGuardianDice + "d6 guardian dice per rest.\n";
+                }
+                if (level >= 9) {
+                    features += "Whispercatcher: Advantage on Perception checks related to hearing.\n";
+                }
+                
+                // Actions progression
+                if (level >= 9) {
+                    actions += "Umbral Aegis: Spend a guardian die to cast darkness. User can see through the darkness.\n";
+                }
+                if (level >= 13) {
+                    actions += "Swift Extraction: Take the Dash action, and designate an ally within 30 ft. to move up to their speed without opportunity attacsk as a reaction.\n";
+                }
+
+                // Bonus Actions progression
+                if (level >= 3) {
+                    bonusActions += "Diverting Gambit: Spend a guardian die to give a target disadvantage on any attacks except against the caster.\n";
+                }
+
+                // Reactions progression
+                if (level >= 3) {
+                    reactions += "Vigilant Courtier " + statMods[1] + "/day: When a creature within 20 ft. makes an opportunity attack against an ally, move to it and make a melee attack.\n";
+                    reactions += "Parrying Shade: Roll guardian dice to reduce damage against an adjacent ally by the result.\n";
+                }
+                if (level >= 17) {
+                    reactions += "Defender's Last Stand: When an ally within 30 ft. is reduced to zero HP, spend a guardian die for them to gain 1d6 + " + level + " hit points.\n";
+                }
+            }
+
+            // Hit points and armor class
+            hitPoints = 8 + ((level - 1) * (5 + statMods[2]));
+            armorClass = 12 + statMods[1];
         }
         else if (charClass.equals("Sorcerer")) {
         }
