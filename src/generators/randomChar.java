@@ -1,5 +1,7 @@
 package generators;
 
+import java.util.ArrayList;
+
 public class randomChar {
     public static void main(String[] args) {
         System.out.println(generateName());
@@ -326,7 +328,7 @@ public class randomChar {
             if (level >= 4) cantripMax++;
             if (level >= 10) cantripMax++;
             for (int i = 0; i < cantripMax; i++) {
-                cantrips += possibleCantrips[roll(possibleCantrips.length) - 1];
+                cantrips += possibleCantrips[i];
                 if (i < cantripMax - 1) cantrips += ", ";
             }
 
@@ -382,7 +384,7 @@ public class randomChar {
             if (level >= 4) cantripMax++;
             if (level >= 10) cantripMax++;
             for (int i = 0; i < cantripMax; i++) {
-                cantrips += possibleCantrips[roll(possibleCantrips.length) - 1];
+                cantrips += possibleCantrips[i];
                 if (i < cantripMax - 1) cantrips += ", ";
             }
 
@@ -581,7 +583,7 @@ public class randomChar {
             if (level >= 4) cantripMax++;
             if (level >= 10) cantripMax++;
             for (int i = 0; i < cantripMax; i++) {
-                cantrips += possibleCantrips[roll(possibleCantrips.length) - 1];
+                cantrips += possibleCantrips[i];
                 if (i < cantripMax - 1) cantrips += ", ";
             }
 
@@ -1190,7 +1192,7 @@ public class randomChar {
             String[] possibleCantrips = {"Firebolt", "Mind Sliver", "Light", "Message", "Blade Ward", "Minor Illusion"};
             String[] possibleSpells = {"Mage Armor", "Ice Knife", "Shield", "Sleep",
                                        "Starlight Cannonball", "Aetheric Adaptation", "Knock",
-                                       "Siren's Call", "Summon Primordial Minion", "Fireball",
+                                       "Siren's Call", "Haste", "Fireball",
                                        "Wall of Aether", "Storm Sphere",
                                        "Dominate Person", "Telekinesis", "Enervation",
                                        "Aetherial Rift",
@@ -1198,6 +1200,145 @@ public class randomChar {
                                        "Earthquake",
                                        "Mass Dominate Person",
                                        "Reverse Gravity", "Abi-Dalzim's Horrid Wilting", "Time Stop"};
+
+            // Sorcery points and metamagic progression
+            int sorceryPoints = 0;
+            if (level >= 1) sorceryPoints = level;
+            String metamagic = "";
+            ArrayList<String> metamagicOptions = new ArrayList<>();
+            metamagicOptions.add("  Careful Spell (1 point): Up to " + statMods[5] + " creatures in a spell's area take no damage.\n");
+            metamagicOptions.add("  Distant Spell (1 point): Cast a touch spell at 30 ft. or double a spell's range.\n");
+            metamagicOptions.add("  Empowered Spell (1 point): Reroll up to " + statMods[5] + " damage dice.\n");
+            metamagicOptions.add("  Extended Spell (1 point): Double a spell's duration up to 24 hours.\n");
+            metamagicOptions.add("  Heightened Spell (2 points): Target gains disadvantage on its saving throw.\n");
+            metamagicOptions.add("  Seeking Spell (1 point): Reroll an attack roll. Can be used with other options.\n");
+            metamagicOptions.add("  Subtle Spell (1 point): Cast with no components, except ones with cost.\n");
+            metamagicOptions.add("  Transmuted Spell (1 point): Change a spell's damage type.\n");
+            metamagicOptions.add("  Twinned Spell (1 point): For spells that upcast for additional targets, upcast once for free.\n");
+            metamagic = "Gain " + sorceryPoints + " sorcery points per day. Points can be spent on these options:\n";
+            metamagic += metamagicOptions.remove(roll(metamagicOptions.size()) - 1);
+            metamagic += metamagicOptions.remove(roll(metamagicOptions.size()) - 1);
+            if (level >= 10) metamagic += metamagicOptions.remove(roll(metamagicOptions.size()) - 1);
+            if (level >= 17) metamagic += metamagicOptions.remove(roll(metamagicOptions.size()) - 1);
+
+            // Features progression
+            if (level >= 2) {
+                features += metamagic;
+                features += "Font of Magic: Burn spell slots for sorcery points equal to the slot's level.\n";
+            }
+            if (level >= 5) {
+                features += "Sorcerous Restoration (1/day): On a long rest, regain up to " + (level / 2) + " sorcery points.\n";
+            }
+            if (level >= 7) {
+                features += "Sorcery Incarnate: While Innate Sorcery is active, two metamagic options can be used per spell.\n";
+            }
+            if (level >= 19) {
+                features += "Epic Boon: Choose an appropriate epic boon.\n";
+            }
+            if (level >= 20) {
+                features += "Arcane Apotheosis: While Innate Sorcery is active, one metamagic option can be used for free each turn.\n";
+            }
+
+            // Bonus Actions progression
+            bonusActions += "Innate Sorcery (2/day): Increase save DC by 1 and gain advantage on spell attacks for 1 minute.\n";
+            if (level >= 2) {
+                bonusActions += "Font of Sorcery: Spend sorcery points to gain spell slots at a rate of 2:1, 3:2, 5:3, 6:4, 7:5.\n";
+            }
+            if (level >= 7) {
+                bonusActions += "Charged Sorcery: Spend 2 sorcery points to activate Innate Sorcery.\n";
+            }
+
+            String[] subClassSpells;
+            int numSubClassSpells = 0;
+            // Subclass 1: Phantom Shrouded
+            if (subClassIndex == 1) {
+                subClassSpells = new String[] {"Comprehend Langauges", "Unseen Servant",
+                                               "Augury", "Spiritual Weapon",
+                                               "Speak with Dead", "Spirit Guardians",
+                                               "Banishment", "Guardian of Faith",
+                                               "Legend Lore", "Soul Tide"};
+                numSubClassSpells = 4;
+                if (level >= 5) numSubClassSpells += 2;
+                if (level >= 7) numSubClassSpells += 2;
+                if (level >= 9) numSubClassSpells += 2;
+
+                // Features progression
+                int phantomDie = 4;
+                if (level >= 5) phantomDie += 2;
+                if (level >= 10) phantomDie += 2;
+                if (level >= 15) phantomDie += 2;
+                
+                if (level >= 3) {
+                    features += "Depths of Knowledge (1/rest): Add 1d" + phantomDie + " to an ability check. Recharge with a sorcery point.\n";
+                }
+                if (level >= 14) {
+                    features += "Ride the Aetherial Tide: Once per turn when casting a spell, roll 1d10. If the result is higher than the spell's level, one metamagic option costs -1.\n";
+                }
+
+                // Actions progression
+                if (level >= 18) {
+                    actions += "Phantom Mantle: Gain resistance to all damage except force and gain +" + statMods[5] + " to AC. Recharge with 6 sorcery points.\n";
+                }
+
+                // Bonus Actions progression
+                if (level >= 6) {
+                    bonusActions += "Swirling Spirits: After casting a leveled spell, spend a sorcery point to target a creature to either gain 1d4 + " + statMods[5] + " temp HP or make a CHA throw, taking spell level + " + statMods[5] + " force damage and losing all speed on a failure.\n";
+                }
+            }
+            // Subclass 2: Primordial Soul
+            else {
+                subClassSpells = new String[] {"Thunderwave (air)", "Entangle (earth)", "Burning Hands (fire)", "Fog Cloud (water)", "Primal Squall (aether)", "Summon Primordial Minion", "Plane Shift"};
+                numSubClassSpells = 5;
+
+                // Features progression
+                if (level >= 3) {
+                    features += "Primordial Magic: Pick an elemental affinity and gain the corresponding spell. Can learn druid spells.\n";
+                }
+                if (level >= 6) {
+                    numSubClassSpells += 1;
+                    features += "Environmental Legion: Summon Primordial Minion summons an additional elemental with that spell. Summoned elementals deal magical damage.\n";
+                }
+                if (level >= 14) {
+                    numSubClassSpells += 1;
+                    features += "Plane Hopper: Plane Shift can be cast once per day without a spell slot. It can be cast without material components, instead linking to a random elemental plane.\n";
+                }
+
+                // Bonus Actions progression
+                if (level >= 18) {
+                    bonusActions += "Whirlpool's Wrath: Spend 6 sorcery points to gain fly speed and emit a 15 ft aether cloud. This is difficult terrain moving towards the caster, disperses other clouds, and causes ranged attack disadvantage.\n";
+                }
+
+                // Reactions progression
+                if (level >= 3) {
+                    reactions += "Elemental Resilience: Reduce incoming elemental damage (type chosen on long rest) by 1d10 + " + (statMods[5] + level) + ".\n";
+                }
+            }
+
+            int[] sorcererPreparedSpellsByLevel = {0,4,5,6,7,9,10,11,12,14,15,16,16,17,17,18,18,19,20,21,22};
+            int preparedSpells = sorcererPreparedSpellsByLevel[Math.min(level, 20)];
+            // Select the first preparedSpells from possibleSpells in order
+            java.util.List<String> spellList = new java.util.ArrayList<>();
+            for (int i = 0; i < Math.min(preparedSpells, possibleSpells.length); i++) {
+                spellList.add(possibleSpells[i]);
+            }
+            for (int i = 0; i < numSubClassSpells; i++) {
+                spellList.add(subClassSpells[roll(subClassSpells.length) - 1]);
+            }
+            spells = String.join(", ", spellList);
+            spellDetails = "Spell Attack: +" + (statMods[5] + proficiencyBonus) + ", Spell DC: " + (8 + statMods[5] + proficiencyBonus) + "\n";
+            
+            // Cantrip progression
+            int cantripMax = 4;
+            if (level >= 4) cantripMax++;
+            if (level >= 10) cantripMax++;
+            for (int i = 0; i < cantripMax; i++) {
+                cantrips += possibleCantrips[i];
+                if (i < cantripMax - 1) cantrips += ", ";
+            }
+
+            // Hit Points and Armor Class
+            hitPoints = 6 + ((level - 1) * (4 + statMods[2]));
+            armorClass = 10 + statMods[1];
         }
         else if (charClass.equals("Warlock")) {
         }
