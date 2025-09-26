@@ -902,7 +902,7 @@ public class randomChar {
                 }
             }
             // Paladin prepared spells progression
-            int[] paladinPreparedSpellsByLevel = {0,0,0,4,5,6,6,7,7,9,9,10,10,11,11,12,12,14,14,15,15};
+            int[] paladinPreparedSpellsByLevel = {2,3,4,5,6,6,7,7,9,9,10,10,11,11,12,12,14,14,15,15};
             int preparedSpells = paladinPreparedSpellsByLevel[Math.min(level, 20)];
             // Select the first preparedSpells from possibleSpells in order
             java.util.List<String> spellList = new java.util.ArrayList<>();
@@ -1034,7 +1034,7 @@ public class randomChar {
             }
 
             // Ranger prepared spells progression
-            int[] rangerPreparedSpellsByLevel = {0,0,0,4,5,6,6,7,7,9,9,10,10,11,11,12,12,14,14,15,15};
+            int[] rangerPreparedSpellsByLevel = {2,3,4,5,6,6,7,7,9,9,10,10,11,11,12,12,14,14,15,15};
             int preparedSpells = rangerPreparedSpellsByLevel[Math.min(level, 20)];
             // Select the first preparedSpells from possibleSpells in order
             java.util.List<String> spellList = new java.util.ArrayList<>();
