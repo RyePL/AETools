@@ -76,9 +76,6 @@ public class randomChar {
         // Select character class using weighted random selection with keyStatRatings as weights
         String charClass = weightedRandomSelect(classes, keyStatRatings);
 
-        // Debug: force class
-        charClass = "Warlock";
-
         // Determine level based on stats
         // "classQuality" is the modifier of the key stat for the class, floor 1
         // "reverseQuality" is the modifier of the character's worst stat, ceiling 0
@@ -89,8 +86,7 @@ public class randomChar {
         int level = multiRoll(4, classQuality) - multiRoll(4, reverseQuality);
         level = Math.max(level, 1);
         level = Math.min(level, 20);
-
-        System.out.println("Level " + level + " " + charClass);
+        //System.out.println("Debug: " + classQuality + "d4 - " + reverseQuality + "d4 = " + level);
 
         //index of spell slots equals spell level
         int[] spellSlots = { 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -651,7 +647,7 @@ public class randomChar {
 
             // --- basic actions ---
             if (attacks > 1) actions += "Multiattack: Make " + attacks + " attacks.\n";
-            actions += "Longsword: +" + statMods[0] + " to hit, 1d8 + " + statMods[0] + " damage.\n";
+            actions += "Longsword: +" + (statMods[0] + proficiencyBonus) + " to hit, 1d8 + " + (statMods[0] + proficiencyBonus) + " damage.\n";
 
             // Battle Commander subclass table features, actions, bonusActions, and reactions
             if (subClassIndex == 1) {
@@ -1506,7 +1502,7 @@ public class randomChar {
             spellDetails = "Spell Attack: +" + (statMods[5] + proficiencyBonus) + ", Spell DC: " + (8 + statMods[5] + proficiencyBonus) + "\n";
 
             // Cantrip progression
-            int cantripMax = 4;
+            int cantripMax = 2;
             if (level >= 4) cantripMax++;
             if (level >= 10) cantripMax++;
             for (int i = 0; i < cantripMax; i++) {
@@ -1519,17 +1515,108 @@ public class randomChar {
             armorClass = 10 + statMods[1];
         }
         else if (charClass.equals("Wizard")) {
+            if (subClassIndex == 1) subClass = "Alacrity Scholar";
+            else subClass = "Technomage";
+
+            String[] possibleCantrips = {"Aether Shroud", "Light", "Mind Sliver", "Mage Hand", "Mold Earth"};
+            String[] possibleSpells = {"Catapault", "Primal Squall", "Shield", "Mage Armor", "Sleep",
+                                       "Aetheric Adaptation", "Starlight Cannonball",
+                                       "Chronovoyance", "Aetheric Communion", "Siren's Call",
+                                       "Aetheric Bedlam","Wall of Aether",
+                                       "Conjure Aether Elemental", "Soul Tide", "Enervation",
+                                       "Aetherial Rift",
+                                       "Create Elemental Portal", "Delayed Blast Fireball",
+                                       "Clone", "Maze", "Teleport",
+                                       "Mass Dominate Person",
+                                       "Summon Dragon", "Chain Lightning", "Mirage Arcane"};
+
+            // Features progression
+            features += "Ritual Adept: Can cast level-appropriate rituals.\n";
+            features += "Arcane Recovery (1/day): Recover combined + " + (level/2) + " spell slots on short rest.\n";
+            if (level >= 5) {
+                features += "Memorize Spell: Replace a prepared leveled spell on short rest.\n";
+            }
+            if (level >= 18) {
+                features += "Spell Mastery: Can cast a chosen level 1 or 2 spell without slots.\n";
+            }
+            if (level >= 19) {
+                features += "Epic Boon: Choose an appropriate epic boon.\n";
+            }
+            if (level >= 20) {
+                features += "Signature Spells: Can cast two chosen level 3 spells without slots once each per rest.\n";
+            }
+            
+            // Subclass 1: Alacrity Scholar
+            if (subClassIndex == 1) {
+                if (level >= 3) {
+                    reactions += "Quick Aether Recovery (" + proficiencyBonus + "/day): On a whiffed cantrip, attack again.\n";
+                    features += "Rapid Response: Add proficiency to initiative rolls.\n";
+                }
+                if (level >= 6) {
+                    reactions += "Quick Teleport: On weapon attack target, expend a spell slot to teleport 5 ft for each level. If still in range, the attack roll is at disadvantage.\n";
+                }
+                if (level >= 10) {
+                    bonusActions += "Quick Casting: After a level spell, cast a cantrip.\n";
+                    reactions += "Lightning Reflexes: When a cast triggers a reaction, finish your cast before it resolves.\n";
+                }
+                if (level >= 14) {
+                    features += "Chronal Lock: Can burn a 3rd level or higher slot on turn start to gain temp HP equal to 3x the slot's level and end incapacitating conditions.\n";
+                }
+            }
+            // Subclass 2: Technomage
+            else {
+                String infusionTimes = "once";
+                if (level >= 6) infusionTimes = "twice";
+                if (level >= 10) infusionTimes = "three times";
+                if (level >= 3) {
+                    features += "Infuse with Aetherium: Infuse up to " + statMods[3] + " items on rest.\n";
+                    features += "Damage Infusion: Weapon deals +" + statMods[3] + " elemental damage.\n";
+                    features += "Structural Infusion: Construct gains +1 AC.\n";
+                    features += "Spell Infusion: Object allows casting of a selected cantrip " + infusionTimes + ".\n";
+                }
+                if (level >= 6) {
+                    features += "Enhanced Infusion: Object allows casting a selected level " + (proficiencyBonus/2) + " spell " + infusionTimes + ".\n";
+                }
+                if (level >= 14) {
+                    features += "Arcane Resilience: One infused object gives advantage on spell saves and resistance to spell damage.\n";
+                }
+            }
+
+            // Wizard cantrip progression
+            int cantripMax = 3;
+            if (level >= 4) cantripMax++;
+            if (level >= 10) cantripMax++;
+            for (int i = 0; i < cantripMax; i++) {
+                cantrips += possibleCantrips[i];
+                if (i < cantripMax - 1) cantrips += ", ";
+            }
+            
+            // Wizard prepared spells progression
+            int[] wizardPreparedSpellsByLevel = {4,5,6,7,9,10,11,12,14,15,16,16,17,18,19,21,22,23,24,25};
+            int preparedSpells = wizardPreparedSpellsByLevel[Math.min(level, 20)];
+            // Select the first preparedSpells from possibleSpells in order
+            java.util.List<String> spellList = new java.util.ArrayList<>();
+            for (int i = 0; i < Math.min(preparedSpells, possibleSpells.length); i++) {
+                spellList.add(possibleSpells[i]);
+            }
+            spells = String.join(", ", spellList);
+            spellDetails = "Spell Attack: +" + (statMods[4] + proficiencyBonus) + ", Spell DC: " + (8 + statMods[4] + proficiencyBonus) + "\n";
+            
+            // Hit Points and Armor Class
+            hitPoints = 6 + ((level - 1) * (4 + statMods[2]));
+            armorClass = 10 + statMods[1];
+
         }
 
-        
-
-        if (level >= 3)System.out.println(subClass);
+        System.out.print("Level " + level + " " + charClass);
+        if (level >= 3)System.out.println("(" + subClass + ") ");
+        else System.out.println("");
         System.out.println("Hit Points: " + hitPoints);
         System.out.println("Armor Class: " + armorClass);
-        System.out.println("Features: " + features);
-        System.out.println("Bonus Actions: " + bonusActions);
-        System.out.println("Actions: " + actions);
-        System.out.println("Reactions: " + reactions);
+        System.out.println("--Features--\n" + features);
+        System.out.println("--Bonus Actions--\n" + bonusActions);
+        System.out.println("--Actions--\n" + actions);
+        System.out.println("--Reactions--\n" + reactions);
         if (!spells.equals("")) {
             System.out.println("Spells: " + spells);
             System.out.println("Spell Details: " + spellDetails);
