@@ -76,6 +76,9 @@ public class randomChar {
         // Select character class using weighted random selection with keyStatRatings as weights
         String charClass = weightedRandomSelect(classes, keyStatRatings);
 
+        // Debug: force class
+        charClass = "Warlock";
+
         // Determine level based on stats
         // "classQuality" is the modifier of the key stat for the class, floor 1
         // "reverseQuality" is the modifier of the character's worst stat, ceiling 0
@@ -1341,6 +1344,179 @@ public class randomChar {
             armorClass = 10 + statMods[1];
         }
         else if (charClass.equals("Warlock")) {
+            if (subClassIndex == 1) subClass = "Reaper";
+            else subClass = "Swarm";
+
+            String[] possibleCantrips = {"Aether Shroud", "Infestation", "Mage Hand", "Friends"};
+            String[] possibleSpells;
+            if (subClassIndex == 1) {
+                possibleSpells = new String[] {"Expeditious Retreat", "Hex", "Ray of Sickness",
+                                               "Blindness/Deafness", "See Invisibility",
+                                               "Bestow Curse", "Speak with Dead",
+                                               "Locate Creature", "Phantasmal Killer",
+                                               "Arcane Hand", "Planar Binding",
+                                               "Bane", "Aether Soul-Link", "Magic Circle", "Gate Seal"};
+            }
+            else {
+                possibleSpells = new String[] {"Entangle", "Hex", "Fog Cloud",
+                                               "Animal Messenger", "Detect Thoughts",
+                                               "Conjure Animals", "Spirit Guardians",
+                                               "Giant Insect", "Stoneskin",
+                                               "Cloudkill", "Insect Plague",
+                                               "Bane", "Aether Soul-Link", "Magic Circle", "Gate Seal"};
+            }
+
+            int numInvocations = 1;
+            if (level >= 2) numInvocations += 2;
+            if (level >= 5) numInvocations += 2;
+            if (level >= 7) numInvocations += 1;
+            if (level >= 9) numInvocations += 1;
+            if (level >= 12) numInvocations += 1;
+            if (level >= 15) numInvocations += 1;
+            if (level >= 18) numInvocations += 1;
+            
+            // Eldritch Invocations selection
+            String invocations = "";
+            String[] invocationNames = new String[] {
+                "Armor of Shadows", "Eldritch Mind", "Pact of the Blade", "Pact of the Chain", "Pact of the Tome",
+                "Agonizing Blast", "Devil's Sight", "Eldritch Spear", "Fiendish Vigor", "Lessons of the First Ones",
+                "Mask of Many Faces", "Misty Visions", "Otherworldly Leap",
+                "Ascendant Step", "Eldritch Smite", "Gaze of Two Minds", "Gift of the Depths", "Investment of the Chain Master",
+                "Master of Myriad Forms", "One with Shadows", "Thirsting Blade", "Whispers of the Grave",
+                "Gift of the Protectors", "Lifedrinker", "Visions of Distant Realms", "Devouring Blade", "Witch Sight"
+            };
+            int[] invocationMinLevel = new int[] {
+                2, 2, 2, 2, 2,
+                2, 2, 2, 2, 2,
+                2, 2, 2,
+                5, 5, 5, 5, 5,
+                5, 5, 5, 7,
+                9, 9, 9, 12, 15
+            };
+            // Prerequisites; empty means none
+            String[] invocationPrereq = new String[] {
+                "", "", "", "", "",
+                "", "", "", "", "",
+                "", "", "",
+                "", "Pact of the Blade", "", "", "Pact of the Chain",
+                "", "", "Pact of the Blade", "",
+                "Pact of the Tome", "Pact of the Blade", "", "Thirsting Blade", ""
+            };
+            java.util.Set<String> chosenInvocations = new java.util.LinkedHashSet<>();
+            int guard = 0;
+            while (chosenInvocations.size() < numInvocations && guard < 1000) {
+                java.util.List<Integer> candidates = new java.util.ArrayList<>();
+                for (int i = 0; i < invocationNames.length; i++) {
+                    if (chosenInvocations.contains(invocationNames[i])) continue;
+                    if (level < invocationMinLevel[i]) continue;
+                    String prereq = invocationPrereq[i];
+                    if (prereq != null && !prereq.isEmpty()) {
+                        if (!chosenInvocations.contains(prereq)) {
+                            continue;
+                        }
+                    }
+                    candidates.add(i);
+                }
+                if (candidates.isEmpty()) break;
+                int pickIndex = candidates.get(roll(candidates.size()) - 1);
+                chosenInvocations.add(invocationNames[pickIndex]);
+                guard++;
+            }
+            if (!chosenInvocations.isEmpty()) {
+                invocations = String.join(", ", chosenInvocations);
+            }
+
+            // Features progression
+            if (level >= 2) {
+                features += "Magical Cunning (1/day): Spend 1 minute regaining half pact slots.\n";
+            }
+            if (level >= 9) {
+                features += "Contact Patron (1/day): Can cast Contact Outer Plane on their patron.\n";
+            }
+            if (level >= 11) {
+                String mysticArcanum = "";
+                mysticArcanum += getRandomElement(new String[] {"Investiture of Flame", "Investiture of Wind", 
+                                                                "Circle of Death", "Arcane Gate"});
+                if (level >= 13) mysticArcanum += ", " + getRandomElement(new String[] {"Crown of Stars", "Forcecage", "Plane Shift", "Etherealness"});
+                if (level >= 15) mysticArcanum += ", " + getRandomElement(new String[] {"Demiplane", "Power Word Stun", "Dominate Monster", "Glibness"});
+                if (level >= 17) mysticArcanum += ", " + getRandomElement(new String[] {"Weird", "Imprisonment", "Foresight", "Blade of Disaster"});
+
+                features += "Mystic Arcanum (1/day each): " + mysticArcanum + ".\n";
+            }
+            if (level >= 19) {
+                features += "Epic Boon: Choose an appropriate epic boon.\n";
+            }
+            if (level >= 20) {
+                features += "Eldritch Master: Magical Cunning regains all pact slots.\n";
+            }
+
+            // Subclass 1: Reaper
+            if (subClassIndex == 1) {
+                if (level >= 3) {
+                    bonusActions += "Reaper's Scythe: Create a weapon with longsword stats that deals necrotic damage and uses Charisma.\n";
+                    features += "Shred and Tear (" + statMods[5] + "/day): On dealing necrotic damage, gain + " + level + " temp HP.\n";
+                }
+                if (level >= 6) {
+                    features += "Aether Harvest: (" + statMods[5] + "/day): On kill with Reaper's Scythe, gain a spell slot that can only be used for reaper spells.\n";
+                }
+                if (level >= 10) {
+                    features += "Reaper's Shroud: Gain resistance to cold and necrotic damage, and immune to fright.\n";
+                    features += "Reaper's Gambit: Can sacrifice all temp HP on a weapon attack to add that amount to the damage.\n";
+                }
+                if (level >= 14) {
+                    actions += "Grim Ferry (1/day): Gain 40 ft swim speed and poison immunity. Can inflict fright (WIS throw) on one enemy as an action. Can teleport 60 ft as an action. Can turn temp HP into healing as a bonus action. 1 minute duration.\n";
+                }
+            }
+            // Subclass 2: Swarm
+            else {
+                if (level >= 3) {
+                    bonusActions += "Swarm Form (" + proficiencyBonus + "/day): Become a swarm for " + (level/2) + " minutes. Can cast cantrips or verbal spells.\n";
+                }
+                if (level >= 6) {
+                    features += "Empowered Swarm: Swarm gains " + (level + statMods[5]) + " temp HP, speed 30, 30 ft blindsight, and telepathy.\n";
+                }
+                if (level >= 10) {
+                    features += "Mind Manipulation: Add Phantasmal Killer to spell list with 1/day free cast. Regain Swarm Form use on cast.\n";
+                }
+                if (level >= 14) {
+                    features += "Swarm Casting: Can cast verbally and somatically in swarm form, and cast cantrips as a bonus action.\n";
+                }
+            }
+
+            // Warlock prepared spells progression
+            int slotLevel = (level - 1) / 2; // 0-indexed
+            if (slotLevel > 5) slotLevel = 5;
+
+            int warlockSlots = 1;
+            if (level >= 2) warlockSlots++;
+            if (level >= 11) warlockSlots++;
+            if (level >= 17) warlockSlots++;
+
+            int[] warlockPreparedSpellsByLevel = {2,3,4,5,6,7,8,9,10,10,11,11,12,12,13,13,14,14,15,15};
+            int preparedSpells = warlockPreparedSpellsByLevel[Math.min(level, 20)];
+
+            spellSlots[slotLevel] = warlockSlots;
+            
+            // Select the first preparedSpells from possibleSpells in order
+            java.util.List<String> spellList = new java.util.ArrayList<>();
+            for (int i = 0; i < Math.min(preparedSpells, possibleSpells.length); i++) {
+                spellList.add(possibleSpells[i]);
+            }
+            spells = String.join(", ", spellList);
+            spellDetails = "Spell Attack: +" + (statMods[5] + proficiencyBonus) + ", Spell DC: " + (8 + statMods[5] + proficiencyBonus) + "\n";
+
+            // Cantrip progression
+            int cantripMax = 4;
+            if (level >= 4) cantripMax++;
+            if (level >= 10) cantripMax++;
+            for (int i = 0; i < cantripMax; i++) {
+                cantrips += possibleCantrips[i];
+                if (i < cantripMax - 1) cantrips += ", ";
+            }
+
+            // Hit Points and Armor Class
+            hitPoints = 6 + ((level - 1) * (4 + statMods[2]));
+            armorClass = 10 + statMods[1];
         }
         else if (charClass.equals("Wizard")) {
         }
@@ -1526,6 +1702,15 @@ public class randomChar {
         
         // Fallback to last item (shouldn't reach here if weights are valid)
         return items[items.length - 1];
+    }
+
+    public static String getRandomElement(String[] array) {
+        if (array == null || array.length == 0) {
+            return null;
+        }
+        
+        int randomIndex = (int) (Math.random() * array.length);
+        return array[randomIndex];
     }
 
     private static void abilityImprovement(int[] abilities, String[] statNames, String firstStat, String secondStat) {
