@@ -3,8 +3,9 @@ package generators;
 import java.util.ArrayList;
 
 public class randomChar {
-    public static void main(String[] args) {
-        System.out.println(generateName());
+    public static String main(String[] args) {
+        StringBuilder output = new StringBuilder();
+        output.append(generateName()).append("\n");
 
         String[] statNames = {"STR", "DEX", "CON", "INT", "WIS", "CHA"};
         int[] statValues = new int[6];
@@ -61,7 +62,7 @@ public class randomChar {
         }
         
         String secondaryQualitiesString = String.join(", ", selectedSecondaryQualities);
-        System.out.println(qualities[bestStatIndex][bestQualityIndex] + ", " + qualities[worstStatIndex][worstQualityIndex] + ", " + secondaryQualitiesString);
+        output.append(qualities[bestStatIndex][bestQualityIndex] + ", " + qualities[worstStatIndex][worstQualityIndex] + ", " + secondaryQualitiesString).append("\n");
         
         String[] classes = {"Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"};
         String[] keyStats = {"STR", "CHA", "WIS", "WIS", "STR", "DEX", "STR", "DEX", "DEX", "CHA", "CHA", "INT"};
@@ -73,8 +74,68 @@ public class randomChar {
             keyStatRatings[i] = statValues[matchIndex(statNames, keyStats[i])];
         }
 
-        // Select character class using weighted random selection with keyStatRatings as weights
-        String charClass = weightedRandomSelect(classes, keyStatRatings);
+        // Check if args contains a class override
+        String charClass = null;
+        boolean classOverridden = false;
+        for (String arg : args) {
+            for (String className : classes) {
+                if (arg.equalsIgnoreCase(className)) {
+                    charClass = className;
+                    classOverridden = true;
+                    break;
+                }
+            }
+            if (charClass != null) break;
+        }
+        
+        // If no override found, select character class using weighted random selection with keyStatRatings as weights
+        if (charClass == null) {
+            charClass = weightedRandomSelect(classes, keyStatRatings);
+        }
+
+        // If class was overridden, redo stats for optimal class performance
+        if (classOverridden) {
+            int classIndex = matchIndex(classes, charClass);
+            String keyStat = keyStats[classIndex];
+            String secondaryStat = secondaryStats[classIndex];
+            
+            // Set key stat to 15 and secondary stat to 14
+            statValues[matchIndex(statNames, keyStat)] = 15;
+            statValues[matchIndex(statNames, secondaryStat)] = 14;
+            
+            // Randomly assign 12, 11, 10, and 8 to remaining stats
+            int[] remainingValues = {12, 11, 10, 8};
+            ArrayList<Integer> usedStatIndices = new ArrayList<>();
+            usedStatIndices.add(matchIndex(statNames, keyStat));
+            usedStatIndices.add(matchIndex(statNames, secondaryStat));
+            
+            for (int value : remainingValues) {
+                int randomIndex;
+                do {
+                    randomIndex = (int) (Math.random() * 6);
+                } while (usedStatIndices.contains(randomIndex));
+                
+                statValues[randomIndex] = value;
+                usedStatIndices.add(randomIndex);
+            }
+            
+            // Recalculate statMods
+            for (int i = 0; i < 6; i++) {
+                statMods[i] = (statValues[i] - 10) / 2;
+            }
+            
+            // Recalculate bestStatIndex and worstStatIndex
+            bestStatIndex = 0;
+            worstStatIndex = 0;
+            for (int i = 1; i < 6; i++) {
+                if (statValues[i] > statValues[bestStatIndex]) {
+                    bestStatIndex = i;
+                }
+                if (statValues[i] < statValues[worstStatIndex]) {
+                    worstStatIndex = i;
+                }
+            }
+        }
 
         // Determine level based on stats
         // "classQuality" is the modifier of the key stat for the class, floor 1
@@ -1608,22 +1669,22 @@ public class randomChar {
 
         }
 
-        System.out.print("Level " + level + " " + charClass);
-        if (level >= 3)System.out.println("(" + subClass + ") ");
-        else System.out.println("");
-        System.out.println("Hit Points: " + hitPoints);
-        System.out.println("Armor Class: " + armorClass);
-        System.out.println("--Features--\n" + features);
-        System.out.println("--Bonus Actions--\n" + bonusActions);
-        System.out.println("--Actions--\n" + actions);
-        System.out.println("--Reactions--\n" + reactions);
+        output.append("Level " + level + " " + charClass);
+        if (level >= 3) output.append("(" + subClass + ") ");
+        output.append("\n");
+        output.append("Hit Points: " + hitPoints).append("\n");
+        output.append("Armor Class: " + armorClass).append("\n");
+        output.append("--Features--\n" + features).append("\n");
+        output.append("--Bonus Actions--\n" + bonusActions).append("\n");
+        output.append("--Actions--\n" + actions).append("\n");
+        output.append("--Reactions--\n" + reactions).append("\n");
         if (!spells.equals("")) {
-            System.out.println("Spells: " + spells);
-            System.out.println("Spell Details: " + spellDetails);
+            output.append("Spells: " + spells).append("\n");
+            output.append("Spell Details: " + spellDetails).append("\n");
 
             // Print spell slots if any are nonzero
             if (!cantrips.equals("")) {
-                System.out.println("Cantrips: " + cantrips);
+                output.append("Cantrips: " + cantrips).append("\n");
             }
             String[] ordinal = {"1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"};
             StringBuilder slotLine = new StringBuilder();
@@ -1634,9 +1695,11 @@ public class randomChar {
                 }
             }
             if (slotLine.length() > 0) {
-                System.out.println("Spell Slots: " + slotLine.toString());
+                output.append("Spell Slots: " + slotLine.toString()).append("\n");
             }
         }
+        
+        return output.toString();
     }
 
     public static String generateName() {

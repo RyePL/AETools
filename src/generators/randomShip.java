@@ -1,7 +1,9 @@
 package generators;
 
 public class randomShip {
-    public static void main(String[] args) {
+    public static String main(String[] args) {
+        StringBuilder result = new StringBuilder();
+        
         int roll = roll(100);
         String faction = stringSelect(roll, new int[] {20, 60, 80, 100}, new String[] {"Ayrissian", "Independent", "Karelagne", "Pirate"});
         String prefix = stringSelect(roll, new int[] {20, 60, 80, 100}, new String[] {"AMS ", "", "INS ", ""});
@@ -33,7 +35,7 @@ public class randomShip {
         };
         
         String shipName = "The " + prefix + firstNames[roll(firstNames.length) - 1] + secondNames[roll(secondNames.length) - 1];
-        System.out.println(shipName);
+        result.append(shipName).append("\n");
 
 
         double armament = doubleSelect(roll(100), new int[] {10, 20, 70, 85, 100}, new Double[] {0.0, 0.2, 0.5, 0.8, 1.0});
@@ -41,7 +43,7 @@ public class randomShip {
         roll = roll(100);
         String shipType = stringSelect(roll, new int[] {25, 50, 70, 85, 95, 100}, shipTypes);
 
-        System.out.println(faction + " " + shipType);
+        result.append(faction + " " + shipType).append("\n");
 
         // Determine crew size and loot
         int crewSize = 0, maxCrewSize = 0, loot = 0;
@@ -70,13 +72,13 @@ public class randomShip {
             maxCrewSize = 100;
             loot = 1000 * multiRoll(8, 8);
         }
-        System.out.println("Crew Size: " + crewSize + " / " + maxCrewSize);
+        result.append("Crew Size: " + crewSize + " / " + maxCrewSize).append("\n");
         //Merchant ships have double loot
         //Ayris is always merchant, Karelagne is 1/5 chance, Independent is 1/4 chance
         if ((faction.equals("Ayrissian") || ((faction.equals("Karelagne") && (roll(5) == 1)) || (faction.equals("Independent") && (roll(4) == 1))))) {
             loot *= 2;
         }
-        System.out.println("Loot: " + loot + " gp");
+        result.append("Loot: " + loot + " gp").append("\n");
 
         // Determine weapon slots
         int bowSlots = (int) (intSelect(roll, new int[] {25, 50, 70, 85, 95, 100}, new int[] {0, 0, 0, 0, 2, 2}) * armament);
@@ -151,12 +153,12 @@ public class randomShip {
         
         // Print weapon arrays as summary counts
         if (bowSlots > 0) {
-            System.out.println("Bow Weapons: " + summarizeArray(bowWeapons));
+            result.append("Bow Weapons: " + summarizeArray(bowWeapons)).append("\n");
         }
-        System.out.println("Port Weapons: " + summarizeArray(portWeapons));
-        System.out.println("Starboard Weapons: " + summarizeArray(starboardWeapons));
+        result.append("Port Weapons: " + summarizeArray(portWeapons)).append("\n");
+        result.append("Starboard Weapons: " + summarizeArray(starboardWeapons)).append("\n");
         if (sternSlots > 0) {
-            System.out.println("Stern Weapons: " + summarizeArray(sternWeapons));
+            result.append("Stern Weapons: " + summarizeArray(sternWeapons)).append("\n");
         }
         
         boolean specialAmmunition = false;
@@ -208,8 +210,8 @@ public class randomShip {
             upgradeList = String.join(", ", upgradeSet);
         }
 
-        if (specialAmmunition) System.out.println("Special Ammunition: " + specialAmmunitionList);
-        if (upgrade) System.out.println("Upgrades: " + upgradeList);
+        if (specialAmmunition) result.append("Special Ammunition: " + specialAmmunitionList).append("\n");
+        if (upgrade) result.append("Upgrades: " + upgradeList).append("\n");
 
         int stationBonus = intSelect(indexMatch(shipType, shipTypes), new int[] {0, 1, 2, 3, 4, 5}, new int[] {0, 2, 4, 6, 8, 10});
         int filledStations = intSelect(roll(20)+stationBonus, new int[] {4, 14, 20, 24, 27, 29, 30}, new int[] {4, 5, 6, 7, 8, 9, 10});
@@ -294,27 +296,29 @@ public class randomShip {
         }
         
         // Print ranked officers
-        System.out.println("Ranked Officers:");
+        result.append("Ranked Officers:").append("\n");
         for (int i = 0; i < rankedIndex; i++) {
-            System.out.print("  " + rankedOfficerNames[i] + ": " + randomChar.generateName());
-            System.out.println(" (Rank " + rankedOfficerRanks[i] + ")");
+            result.append("  " + rankedOfficerNames[i] + ": " + randomChar.generateName());
+            result.append(" (Rank " + rankedOfficerRanks[i] + ")").append("\n");
             if (rankedOfficerRanks[i] >= 2) {
-                System.out.println("  Boons: " + randomChar.generateBoons(rankedOfficerRanks[i]));
+                result.append("  Boons: " + randomChar.generateBoons(rankedOfficerRanks[i])).append("\n");
             }
         }
         
         // Print non-ranked officers
-        System.out.println("Non-ranked Officers:");
+        result.append("Non-ranked Officers:").append("\n");
         for (int i = 0; i < officers.length; i++) {
             if (!officers[i].equals("") && !java.util.Arrays.asList(rankedOfficerNames).contains(officers[i])) {
-                System.out.println("  " + officers[i] + ": " + randomChar.generateName());
+                result.append("  " + officers[i] + ": " + randomChar.generateName()).append("\n");
             }
         }
         
         // Print ranked non-officer if applicable
         if (rankedOfficers > filledStations) {
-            System.out.println("1 ranked non-officer in the crew");
+            result.append("1 ranked non-officer in the crew").append("\n");
         }
+        
+        return result.toString();
     }
 
     private static int roll(int size) {
